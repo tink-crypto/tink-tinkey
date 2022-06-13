@@ -1,0 +1,12 @@
+licenses(["notice"])
+
+java_binary(
+    name = "tinkey",
+    main_class = "com.google.crypto.tink.tinkey.Tinkey",
+    visibility = [
+        "//visibility:public",
+    ],
+    runtime_deps = [
+        "//src/main/java/com/google/crypto/tink/tinkey",
+    ],
+)
