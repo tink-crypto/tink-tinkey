@@ -58,7 +58,7 @@ echo "Using Tink Java Google Cloud KMS from ${TINK_BASE_DIR}/tink_java_gcpkms"
 
 # Sourcing required to update caller's environment.
 source ./kokoro/testutils/install_python3.sh
-./kokoro/testutils/copy_credentials.sh "java_src/testdata"
+./kokoro/testutils/copy_credentials.sh "testdata"
 ./kokoro/testutils/update_android_sdk.sh
 
 cp "WORKSPACE" "WORKSPACE.bak"
