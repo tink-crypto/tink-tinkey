@@ -25,36 +25,14 @@ if [[ -n "${KOKORO_ROOT:-}" ]]; then
   use_bazel.sh "$(cat .bazelversion)"
 fi
 
-# Note: When running on the Kokoro CI, we expect these folders to exist:
-#
-#  ${KOKORO_ARTIFACTS_DIR}/git/tink_java
-#  ${KOKORO_ARTIFACTS_DIR}/git/tink_java_awskms
-#  ${KOKORO_ARTIFACTS_DIR}/git/tink_java_gcpkms
-#  ${KOKORO_ARTIFACTS_DIR}/git/tink_tinkey
-#
-# If this is not the case, we are using this script locally for a manual on-off
-# test (running it from the root of a local copy of the tink-examples
-# repository), and so we are going to checkout tink from GitHub).
-if [[ ( -z "${TINK_BASE_DIR:-}" && -z "${KOKORO_ROOT:-}") \
-      || -n "${KOKORO_ROOT:-}" ]]; then
-  TINK_BASE_DIR="$(pwd)/.."
-  if [[ ! -d "${TINK_BASE_DIR}/tink_java" ]]; then
-    git clone https://github.com/tink-crypto/tink-java.git \
-      "${TINK_BASE_DIR}/tink_java"
-  fi
-  if [[ ! -d "${TINK_BASE_DIR}/tink_java_awskms" ]]; then
-    git clone https://github.com/tink-crypto/tink-java-awskms.git \
-      "${TINK_BASE_DIR}/tink_java_awskms"
-  fi
-  if [[ ! -d "${TINK_BASE_DIR}/tink_java_gcpkms" ]]; then
-    git clone https://github.com/tink-crypto/tink-java-gcpkms.git \
-      "${TINK_BASE_DIR}/tink_java_gcpkms"
-  fi
-fi
+: "${TINK_BASE_DIR:=$(cd .. && pwd)}"
 
-echo "Using Tink Java from ${TINK_BASE_DIR}/tink_java"
-echo "Using Tink Java AWS KMS from ${TINK_BASE_DIR}/tink_java_awskms"
-echo "Using Tink Java Google Cloud KMS from ${TINK_BASE_DIR}/tink_java_gcpkms"
+# Check for dependencies in TINK_BASE_DIR. Any that aren't present will be
+# downloaded.
+readonly GITHUB_ORG="https://github.com/tink-crypto"
+./kokoro/testutils/fetch_git_repo_if_not_present.sh "${TINK_BASE_DIR}" \
+  "${GITHUB_ORG}/tink-java" "${GITHUB_ORG}/tink-java-awskms" \
+  "${GITHUB_ORG}/tink-java-gcpkms"
 
 # Sourcing required to update caller's environment.
 source ./kokoro/testutils/install_python3.sh
