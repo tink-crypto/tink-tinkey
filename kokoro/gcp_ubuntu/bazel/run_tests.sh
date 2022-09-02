@@ -21,7 +21,11 @@ set -euo pipefail
 
 # If we are running on Kokoro cd into the repository.
 if [[ -n "${KOKORO_ROOT:-}" ]]; then
-  cd "${KOKORO_ARTIFACTS_DIR}/git/tink_tinkey"
+  # Note: When running Tink tests on Kokoro either <KOKORO_ARTIFACTS_DIR>/git
+  # or <KOKORO_ARTIFACTS_DIR>/github is present. The presence of any other
+  # folder in KOKORO_ARTIFACTS_DIR that matches git* will make the test fail.
+  TINK_BASE_DIR="$(echo "${KOKORO_ARTIFACTS_DIR}"/git*)"
+  cd "${TINK_BASE_DIR}/tink_tinkey"
   use_bazel.sh "$(cat .bazelversion)"
 fi
 
