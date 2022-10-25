@@ -39,16 +39,12 @@ readonly GITHUB_ORG="https://github.com/tink-crypto"
   "${GITHUB_ORG}/tink-java" "${GITHUB_ORG}/tink-java-awskms" \
   "${GITHUB_ORG}/tink-java-gcpkms"
 
-# Sourcing required to update caller's environment.
-source ./kokoro/testutils/install_python3.sh
 ./kokoro/testutils/copy_credentials.sh "testdata" "all"
-./kokoro/testutils/update_android_sdk.sh
 
 cp "WORKSPACE" "WORKSPACE.bak"
 
 ./kokoro/testutils/replace_http_archive_with_local_repository.py \
-  -f "WORKSPACE" \
-  -t "${TINK_BASE_DIR}"
+  -f "WORKSPACE" -t "${TINK_BASE_DIR}"
 
 # Tests that require AWS/Google Cloud KMS credentials are only run in Kokoro.
 TINK_TINKEY_MANUAL_TARGETS=()
