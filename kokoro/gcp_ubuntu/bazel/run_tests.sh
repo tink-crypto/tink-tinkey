@@ -26,7 +26,8 @@ if [[ -n "${KOKORO_ROOT:-}" ]]; then
   # folder in KOKORO_ARTIFACTS_DIR that matches git* will make the test fail.
   TINK_BASE_DIR="$(echo "${KOKORO_ARTIFACTS_DIR}"/git*)"
   cd "${TINK_BASE_DIR}/tink_tinkey"
-  use_bazel.sh "$(cat .bazelversion)"
+  chmod +x "${KOKORO_GFILE_DIR}/use_bazel.sh"
+  "${KOKORO_GFILE_DIR}/use_bazel.sh" "$(cat .bazelversion)"
 fi
 
 : "${TINK_BASE_DIR:=$(cd .. && pwd)}"
