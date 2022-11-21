@@ -19,9 +19,9 @@
 
 set -euo pipefail
 
-export XCODE_VERSION=11.3
+export XCODE_VERSION=14
 export DEVELOPER_DIR="/Applications/Xcode_${XCODE_VERSION}.app/Contents/Developer"
-export ANDROID_HOME="/Users/kbuilder/Library/Android/sdk"
+export ANDROID_HOME="/usr/local/share/android-sdk"
 export COURSIER_OPTS="-Djava.net.preferIPv6Addresses=true"
 
 # If we are running on Kokoro cd into the repository.
@@ -31,7 +31,9 @@ if [[ -n "${KOKORO_ROOT:-}" ]]; then
   # folder in KOKORO_ARTIFACTS_DIR that matches git* will make the test fail.
   TINK_BASE_DIR="$(echo "${KOKORO_ARTIFACTS_DIR}"/git*)"
   cd "${TINK_BASE_DIR}/tink_tinkey"
-  use_bazel.sh "$(cat .bazelversion)"
+  chmod +x "${KOKORO_GFILE_DIR}/use_bazel.sh"
+  "${KOKORO_GFILE_DIR}/use_bazel.sh" "$(cat .bazelversion)"
+  export JAVA_HOME=$(/usr/libexec/java_home -v "1.8.0_292")
 fi
 
 : "${TINK_BASE_DIR:=$(cd .. && pwd)}"
