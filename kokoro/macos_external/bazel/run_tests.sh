@@ -31,8 +31,6 @@ if [[ -n "${KOKORO_ROOT:-}" ]]; then
   # folder in KOKORO_ARTIFACTS_DIR that matches git* will make the test fail.
   TINK_BASE_DIR="$(echo "${KOKORO_ARTIFACTS_DIR}"/git*)"
   cd "${TINK_BASE_DIR}/tink_tinkey"
-  chmod +x "${KOKORO_GFILE_DIR}/use_bazel.sh"
-  "${KOKORO_GFILE_DIR}/use_bazel.sh" "$(cat .bazelversion)"
   export JAVA_HOME=$(/usr/libexec/java_home -v "1.8.0_292")
 fi
 
@@ -52,8 +50,7 @@ readonly GITHUB_ORG="https://github.com/tink-crypto"
 cp "WORKSPACE" "WORKSPACE.bak"
 
 ./kokoro/testutils/replace_http_archive_with_local_repository.py \
-  -f "WORKSPACE" \
-  -t "${TINK_BASE_DIR}"
+  -f "WORKSPACE" -t "${TINK_BASE_DIR}"
 
 # Tests that require AWS/Google Cloud KMS credentials are only run in Kokoro.
 TINK_TINKEY_MANUAL_TARGETS=()
