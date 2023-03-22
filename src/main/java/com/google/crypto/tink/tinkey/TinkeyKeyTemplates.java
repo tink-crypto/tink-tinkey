@@ -18,7 +18,7 @@ package com.google.crypto.tink.tinkey;
 
 import com.google.crypto.tink.KeyTemplate;
 import com.google.crypto.tink.KeyTemplates;
-// Placeholder for PrfBasedDeriverKeyManager. DO NOT EDIT.
+// Placeholder for KeyDerivationKeyTemplates. DO NOT EDIT.
 import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.HashMap;
