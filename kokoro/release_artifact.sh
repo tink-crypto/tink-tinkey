@@ -60,13 +60,19 @@ cp "WORKSPACE" "WORKSPACE.bak"
 ./kokoro/testutils/replace_http_archive_with_local_repository.py \
   -f "WORKSPACE" -t "${TINK_BASE_DIR}"
 
+RELEASE_TINKEY_ARGS=()
+if [[ "${DO_MAKE_RELEASE}" == "false" ]]; then
+  # Run in dry-run mode.
+  RELEASE_TINKEY_ARGS+=( -d )
+fi
+readonly RELEASE_TINKEY_ARGS
+
 if [[ "${IS_KOKORO}" == "true" && "${DO_MAKE_RELEASE}" == "true" ]]; then
   gcloud auth activate-service-account \
     --key-file="${KOKORO_KEYSTORE_DIR}/70968_tink_tinkey_release_service_key"
   gcloud config set project tink-test-infrastructure
-  ./release_tinkey.sh "${RELEASE_VERSION}"
-else
-  ./release_tinkey.sh -d
 fi
+
+./release_tinkey.sh "${RELEASE_TINKEY_ARGS[@]}" "${RELEASE_VERSION}"
 
 mv "WORKSPACE.bak" "WORKSPACE"
