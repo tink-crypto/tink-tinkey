@@ -19,8 +19,13 @@
 
 set -euo pipefail
 
-# If we are running on Kokoro cd into the repository.
+IS_KOKORO="false"
 if [[ -n "${KOKORO_ROOT:-}" ]]; then
+  IS_KOKORO="true"
+fi
+readonly IS_KOKORO
+
+if [[ "${IS_KOKORO}" == "true" ]]; then
   # Note: When running Tink tests on Kokoro either <KOKORO_ARTIFACTS_DIR>/git
   # or <KOKORO_ARTIFACTS_DIR>/github is present. The presence of any other
   # folder in KOKORO_ARTIFACTS_DIR that matches git* will make the test fail.
@@ -37,13 +42,25 @@ readonly GITHUB_ORG="https://github.com/tink-crypto"
   "${GITHUB_ORG}/tink-java" "${GITHUB_ORG}/tink-java-awskms" \
   "${GITHUB_ORG}/tink-java-gcpkms"
 
-./kokoro/testutils/copy_credentials.sh "testdata" "all"
-
 cp "WORKSPACE" "WORKSPACE.bak"
 
 ./kokoro/testutils/replace_http_archive_with_local_repository.py \
   -f "WORKSPACE" -t "${TINK_BASE_DIR}"
 
-./release_tinkey.sh -d
+readonly GITHUB_JOB_NAME="tink/github/tinkey/gcp_ubuntu/release/continuous"
+
+RELEASE_TINKEY_ARGS=()
+if [[ "${IS_KOKORO}" == "true" \
+      && "${KOKORO_JOB_NAME}" == "${GITHUB_JOB_NAME}" ]]; then
+  gcloud auth activate-service-account \
+    --key-file="${KOKORO_KEYSTORE_DIR}/70968_tink_tinkey_release_service_key"
+  gcloud config set project tink-test-infrastructure
+else
+  # Run in dry-run mode.
+  RELEASE_TINKEY_ARGS+=( -d )
+fi
+readonly RELEASE_TINKEY_ARGS
+
+./release_tinkey.sh "${RELEASE_TINKEY_ARGS[@]}"
 
 mv "WORKSPACE.bak" "WORKSPACE"
