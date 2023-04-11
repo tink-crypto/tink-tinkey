@@ -21,6 +21,8 @@ Management Service (KMS). Out of the box it supports AWS KMS and Google Cloud
 KMS. Adding support for other KMSs is easy, and doesn't require modifying
 Tinkey.
 
+The latest release is 1.8.0.
+
 The official documentation is available at
 https://developers.google.com/tink/tinkey-overview.
 
