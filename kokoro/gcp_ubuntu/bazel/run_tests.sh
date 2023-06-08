@@ -48,7 +48,6 @@ cp "WORKSPACE" "WORKSPACE.bak"
 TINK_TINKEY_MANUAL_TARGETS=()
 if [[ -n "${KOKORO_ROOT:-}" ]]; then
   TINK_TINKEY_MANUAL_TARGETS+=(
-    "//src/test/java/com/google/crypto/tink/tinkey:AddKeyCommandTest"
     "//src/test/java/com/google/crypto/tink/tinkey:CreatePublicKeysetCommandTest"
     "//src/test/java/com/google/crypto/tink/tinkey:CreateKeysetCommandTest"
     "//src/test/java/com/google/crypto/tink/tinkey:RotateKeysetCommandTest"
