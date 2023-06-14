@@ -37,8 +37,6 @@ readonly GITHUB_ORG="https://github.com/tink-crypto"
   "${GITHUB_ORG}/tink-java" "${GITHUB_ORG}/tink-java-awskms" \
   "${GITHUB_ORG}/tink-java-gcpkms"
 
-./kokoro/testutils/copy_credentials.sh "testdata" "all"
-
 cp "WORKSPACE" "WORKSPACE.bak"
 
 ./kokoro/testutils/replace_http_archive_with_local_repository.py \

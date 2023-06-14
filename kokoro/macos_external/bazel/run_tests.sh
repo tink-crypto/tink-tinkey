@@ -43,8 +43,6 @@ readonly GITHUB_ORG="https://github.com/tink-crypto"
   "${GITHUB_ORG}/tink-java" "${GITHUB_ORG}/tink-java-awskms" \
   "${GITHUB_ORG}/tink-java-gcpkms"
 
-# Sourcing required to update caller's environment.
-./kokoro/testutils/copy_credentials.sh "testdata" "all"
 ./kokoro/testutils/update_android_sdk.sh
 
 cp "WORKSPACE" "WORKSPACE.bak"
