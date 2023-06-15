@@ -42,17 +42,6 @@ cp "WORKSPACE" "WORKSPACE.bak"
 ./kokoro/testutils/replace_http_archive_with_local_repository.py \
   -f "WORKSPACE" -t "${TINK_BASE_DIR}"
 
-# Tests that require AWS/Google Cloud KMS credentials are only run in Kokoro.
-TINK_TINKEY_MANUAL_TARGETS=()
-if [[ -n "${KOKORO_ROOT:-}" ]]; then
-  TINK_TINKEY_MANUAL_TARGETS+=(
-    "//src/test/java/com/google/crypto/tink/tinkey:CreatePublicKeysetCommandTest"
-    "//src/test/java/com/google/crypto/tink/tinkey:CreateKeysetCommandTest"
-    "//src/test/java/com/google/crypto/tink/tinkey:RotateKeysetCommandTest"
-  )
-fi
-readonly TINK_TINKEY_MANUAL_TARGETS
-
-./kokoro/testutils/run_bazel_tests.sh . "${TINK_TINKEY_MANUAL_TARGETS[@]}"
+./kokoro/testutils/run_bazel_tests.sh .
 
 mv "WORKSPACE.bak" "WORKSPACE"
