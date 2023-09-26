@@ -14,17 +14,17 @@
 # limitations under the License.
 ################################################################################
 
-# By default when run locally this script runs the command below directly on the
-# host. The CONTAINER_IMAGE variable can be set to run on a custom container
-# image for local testing. E.g.:
+# Builds and tests tink-tinkey release.
 #
-# CONTAINER_IMAGE="us-docker.pkg.dev/tink-test-infrastructure/tink-ci-images/linux-tink-java-gcloud:latest" \
-#  sh ./kokoro/gcp_ubuntu/bazel/run_tests.sh
+# The behavior of this script can be modified using the following optional env
+# variables:
 #
-# The user may specify TINK_BASE_DIR as the folder where to look for
-# tink-java-awskms and its depndencies. That is:
-#   ${TINK_BASE_DIR}/tink_java
-#   ${TINK_BASE_DIR}/tink_tinkey
+# - CONTAINER_IMAGE (unset by default): By default when run locally this script
+#   executes tests directly on the host. The CONTAINER_IMAGE variable can be set
+#   to execute tests in a custom container image for local testing. E.g.:
+#
+#   CONTAINER_IMAGE="us-docker.pkg.dev/tink-test-infrastructure/tink-ci-images/linux-tink-java-base:latest" \
+#     sh ./kokoro/gcp_ubuntu/release/run_tests.sh
 set -eEuo pipefail
 
 IS_KOKORO="false"
@@ -34,45 +34,29 @@ fi
 readonly IS_KOKORO
 
 if [[ "${IS_KOKORO}" == "true" ]]; then
-  TINK_BASE_DIR="$(echo "${KOKORO_ARTIFACTS_DIR}"/git*)"
+  readonly TINK_BASE_DIR="$(echo "${KOKORO_ARTIFACTS_DIR}"/git*)"
   cd "${TINK_BASE_DIR}/tink_tinkey"
   source "./kokoro/testutils/java_test_container_images.sh"
   CONTAINER_IMAGE="${TINK_JAVA_GCLOUD_IMAGE}"
   RUN_COMMAND_ARGS+=( -k "${TINK_GCR_SERVICE_KEY}" )
 fi
-: "${TINK_BASE_DIR:=$(cd .. && pwd)}"
-readonly TINK_BASE_DIR
 readonly CONTAINER_IMAGE
 
 if [[ -n "${CONTAINER_IMAGE:-}" ]]; then
   RUN_COMMAND_ARGS+=( -c "${CONTAINER_IMAGE}" )
 fi
 
-cp WORKSPACE WORKSPACE.bak
-
-# Check for dependencies in TINK_BASE_DIR. Any that aren't present will be
-# downloaded.
-readonly GITHUB_ORG="https://github.com/tink-crypto"
-./kokoro/testutils/fetch_git_repo_if_not_present.sh "${TINK_BASE_DIR}" \
-  "${GITHUB_ORG}/tink-java" "${GITHUB_ORG}/tink-java-awskms" \
-  "${GITHUB_ORG}/tink-java-gcpkms"
-
-cp "WORKSPACE" "WORKSPACE.bak"
-./kokoro/testutils/replace_http_archive_with_local_repository.py \
-  -f "WORKSPACE" -t ..
-
 # Run cleanup on EXIT.
 trap cleanup EXIT
 
 cleanup() {
-  mv WORKSPACE.bak WORKSPACE
   rm -rf _do_run_test.sh
 }
 
-readonly GITHUB_JOB_NAME="tink/github/tinkey/gcp_ubuntu/release/continuous"
+readonly CONTINUOUS_JOB_NAME="tink/github/tinkey/gcp_ubuntu/release/continuous"
 
 if [[ "${IS_KOKORO}" == "true" \
-      && "${KOKORO_JOB_NAME}" == "${GITHUB_JOB_NAME}" ]]; then
+      && "${KOKORO_JOB_NAME}" == "${CONTINUOUS_JOB_NAME}" ]]; then
   # Copy the service key to make sure it is available to the container.
   cp "${KOKORO_KEYSTORE_DIR}/70968_tink_tinkey_release_service_key" \
     release_service_key
