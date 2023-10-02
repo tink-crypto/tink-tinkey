@@ -37,28 +37,13 @@ if [[ ! "${DO_MAKE_RELEASE}" =~ ^(false|true)$ ]]; then
   exit 1
 fi
 
-# If we are running on Kokoro cd into the repository.
 if [[ "${IS_KOKORO}" == "true" ]]; then
   # Note: When running Tink tests on Kokoro either <KOKORO_ARTIFACTS_DIR>/git
   # or <KOKORO_ARTIFACTS_DIR>/github is present. The presence of any other
   # folder in KOKORO_ARTIFACTS_DIR that matches git* will make the test fail.
-  TINK_BASE_DIR="$(echo "${KOKORO_ARTIFACTS_DIR}"/git*)"
+  readonly TINK_BASE_DIR="$(echo "${KOKORO_ARTIFACTS_DIR}"/git*)"
   cd "${TINK_BASE_DIR}/tink_tinkey"
 fi
-
-: "${TINK_BASE_DIR:=$(cd .. && pwd)}"
-
-# Check for dependencies in TINK_BASE_DIR. Any that aren't present will be
-# downloaded.
-readonly GITHUB_ORG="https://github.com/tink-crypto"
-./kokoro/testutils/fetch_git_repo_if_not_present.sh "${TINK_BASE_DIR}" \
-  "${GITHUB_ORG}/tink-java" "${GITHUB_ORG}/tink-java-awskms" \
-  "${GITHUB_ORG}/tink-java-gcpkms"
-
-cp "WORKSPACE" "WORKSPACE.bak"
-
-./kokoro/testutils/replace_http_archive_with_local_repository.py \
-  -f "WORKSPACE" -t "${TINK_BASE_DIR}"
 
 RELEASE_TINKEY_ARGS=()
 if [[ "${DO_MAKE_RELEASE}" == "false" ]]; then
@@ -74,5 +59,3 @@ if [[ "${IS_KOKORO}" == "true" && "${DO_MAKE_RELEASE}" == "true" ]]; then
 fi
 
 ./release_tinkey.sh "${RELEASE_TINKEY_ARGS[@]}" "${RELEASE_VERSION}"
-
-mv "WORKSPACE.bak" "WORKSPACE"
