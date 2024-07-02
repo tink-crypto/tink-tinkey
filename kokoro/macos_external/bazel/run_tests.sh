@@ -14,19 +14,16 @@
 # limitations under the License.
 ################################################################################
 
-# Builds and tests tink-tinkey using Bazel.
+# Builds and tests Tinkey using Bazel.
 set -euo pipefail
 
 export XCODE_VERSION="14.1"
 export DEVELOPER_DIR="/Applications/Xcode.app/Contents/Developer"
-export ANDROID_HOME="/usr/local/share/android-sdk"
-export COURSIER_OPTS="-Djava.net.preferIPv6Addresses=true"
 
 if [[ -n "${KOKORO_ROOT:-}" ]]; then
   readonly TINK_BASE_DIR="$(echo "${KOKORO_ARTIFACTS_DIR}"/git*)"
   cd "${TINK_BASE_DIR}/tink_tinkey"
-  export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-8-latest/Contents/Home
+  export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-11-latest/Contents/Home
 fi
 
-./kokoro/testutils/update_android_sdk.sh
 ./kokoro/testutils/run_bazel_tests.sh .
