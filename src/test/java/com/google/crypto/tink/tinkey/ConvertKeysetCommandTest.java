@@ -23,6 +23,7 @@ import static org.junit.Assert.assertTrue;
 import com.google.crypto.tink.Aead;
 import com.google.crypto.tink.InsecureSecretKeyAccess;
 import com.google.crypto.tink.KeysetHandle;
+import com.google.crypto.tink.RegistryConfiguration;
 import com.google.crypto.tink.TinkJsonProtoKeysetFormat;
 import com.google.crypto.tink.TinkProtoKeysetFormat;
 import com.google.crypto.tink.aead.AeadConfig;
@@ -61,7 +62,7 @@ public final class ConvertKeysetCommandTest {
     TinkeyTestKmsClient.createCredentialFile(credentialFile);
 
     masterKeyAeadKeyset = KeysetHandle.generateNew(PredefinedAeadParameters.AES128_GCM);
-    masterKeyAead = masterKeyAeadKeyset.getPrimitive(Aead.class);
+    masterKeyAead = masterKeyAeadKeyset.getPrimitive(RegistryConfiguration.get(), Aead.class);
     masterKeyUri = TinkeyTestKmsClient.createKeyUri(masterKeyAeadKeyset);
   }
 

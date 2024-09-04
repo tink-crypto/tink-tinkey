@@ -25,6 +25,7 @@ import static org.junit.Assert.assertTrue;
 import com.google.crypto.tink.Aead;
 import com.google.crypto.tink.KeysetHandle;
 import com.google.crypto.tink.KmsClient;
+import com.google.crypto.tink.RegistryConfiguration;
 import com.google.crypto.tink.aead.AeadConfig;
 import com.google.crypto.tink.aead.PredefinedAeadParameters;
 import java.nio.file.Files;
@@ -54,7 +55,7 @@ public final class TinkeyTestKmsClientTest {
     String masterKeyUri = TinkeyTestKmsClient.createKeyUri(handle);
     Aead masterKey =
         new TinkeyTestKmsClient().withCredentials(credentialPath.toString()).getAead(masterKeyUri);
-    Aead manualMasterKey = handle.getPrimitive(Aead.class);
+    Aead manualMasterKey = handle.getPrimitive(RegistryConfiguration.get(), Aead.class);
 
     byte[] ciphertext = manualMasterKey.encrypt(new byte[] {}, new byte[] {});
     assertThat(masterKey.decrypt(ciphertext, new byte[] {})).isEqualTo(new byte[] {});
@@ -103,7 +104,7 @@ public final class TinkeyTestKmsClientTest {
             .newClientFor(masterKeyUri)
             .withCredentials(credentialPath.toString())
             .getAead(masterKeyUri);
-    Aead manualMasterKey = handle.getPrimitive(Aead.class);
+    Aead manualMasterKey = handle.getPrimitive(RegistryConfiguration.get(), Aead.class);
 
     byte[] ciphertext = manualMasterKey.encrypt(new byte[] {}, new byte[] {});
     assertThat(masterKey.decrypt(ciphertext, new byte[] {})).isEqualTo(new byte[] {});
