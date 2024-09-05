@@ -298,7 +298,6 @@ java_library(
     srcs = ["TinkeyTestKmsClient.java"],
     plugins = [":auto_service_plugin"],
     deps = [
-        "@maven//:com_google_auto_service_auto_service_annotations",
         "@maven//:com_google_crypto_tink_tink",
     ],
 )
