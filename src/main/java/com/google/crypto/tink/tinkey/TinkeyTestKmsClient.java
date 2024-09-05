@@ -21,6 +21,7 @@ import com.google.crypto.tink.Aead;
 import com.google.crypto.tink.InsecureSecretKeyAccess;
 import com.google.crypto.tink.KeysetHandle;
 import com.google.crypto.tink.KmsClient;
+import com.google.crypto.tink.RegistryConfiguration;
 import com.google.crypto.tink.TinkJsonProtoKeysetFormat;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -104,6 +105,6 @@ final class TinkeyTestKmsClient implements KmsClient {
     checkCredentials();
     String keyset = stripPrefix(prefix, keyUri);
     return TinkJsonProtoKeysetFormat.parseKeyset(keyset, InsecureSecretKeyAccess.get())
-        .getPrimitive(Aead.class);
+        .getPrimitive(RegistryConfiguration.get(), Aead.class);
   }
 }
