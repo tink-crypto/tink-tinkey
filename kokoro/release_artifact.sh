@@ -14,7 +14,18 @@
 # limitations under the License.
 ################################################################################
 
-set -euo pipefail
+# Builds and releases a tink-tinkey artifact.
+#
+# The behavior of this script can be modified using the following optional env
+# variables:
+#
+# - CONTAINER_IMAGE (unset by default): By default when run locally this script
+#   executes tests directly on the host. The CONTAINER_IMAGE variable can be set
+#   to execute tests in a custom container image for local testing. E.g.:
+#
+#   CONTAINER_IMAGE="us-docker.pkg.dev/tink-test-infrastructure/tink-ci-images/linux-tink-java-gcloud:latest" \
+#     sh ./kokoro/gcp_ubuntu/release/run_tests.sh
+set -eEuo pipefail
 
 # Fail if RELEASE_VERSION is not set.
 if [[ -z "${RELEASE_VERSION:-}" ]]; then
@@ -28,6 +39,19 @@ if [[ -n "${KOKORO_ARTIFACTS_DIR:-}" ]]; then
 fi
 readonly IS_KOKORO
 
+if [[ "${IS_KOKORO}" == "true" ]]; then
+  readonly TINK_BASE_DIR="$(echo "${KOKORO_ARTIFACTS_DIR}"/git*)"
+  cd "${TINK_BASE_DIR}/tink_tinkey"
+  source "./kokoro/testutils/java_test_container_images.sh"
+  CONTAINER_IMAGE="${TINK_JAVA_GCLOUD_IMAGE}"
+  RUN_COMMAND_ARGS+=( -k "${TINK_GCR_SERVICE_KEY}" )
+fi
+readonly CONTAINER_IMAGE
+
+if [[ -n "${CONTAINER_IMAGE:-}" ]]; then
+  RUN_COMMAND_ARGS+=( -c "${CONTAINER_IMAGE}" )
+fi
+
 # WARNING: Setting this environment varialble to "true" will cause this script
 # to actually perform a release.
 : "${DO_MAKE_RELEASE:=false}"
@@ -37,25 +61,30 @@ if [[ ! "${DO_MAKE_RELEASE}" =~ ^(false|true)$ ]]; then
   exit 1
 fi
 
-if [[ "${IS_KOKORO}" == "true" ]]; then
-  # Note: When running Tink tests on Kokoro either <KOKORO_ARTIFACTS_DIR>/git
-  # or <KOKORO_ARTIFACTS_DIR>/github is present. The presence of any other
-  # folder in KOKORO_ARTIFACTS_DIR that matches git* will make the test fail.
-  readonly TINK_BASE_DIR="$(echo "${KOKORO_ARTIFACTS_DIR}"/git*)"
-  cd "${TINK_BASE_DIR}/tink_tinkey"
-fi
+if [[ "${DO_MAKE_RELEASE}" == "true" ]]; then
+  # Run cleanup on EXIT.
+  trap cleanup EXIT
 
-RELEASE_TINKEY_ARGS=()
-if [[ "${DO_MAKE_RELEASE}" == "false" ]]; then
+  cleanup() {
+    rm -rf _activate_gcloud_account_and_release_tinkey.sh
+  }
+  # Copy the service key to make sure it is available to the container.
+  cp "${KOKORO_KEYSTORE_DIR}/70968_tink_tinkey_release_service_key" \
+    release_service_key
+
+  cat <<EOF > _activate_gcloud_account_and_release_tinkey.sh
+#!/bin/bash
+set -euo pipefail
+
+gcloud auth activate-service-account --key-file=release_service_key
+gcloud config set project tink-test-infrastructure
+./release_tinkey.sh "${RELEASE_VERSION}"
+EOF
+
+  chmod +x _activate_gcloud_account_and_release_tinkey.sh
+  ./kokoro/testutils/run_command.sh "${RUN_COMMAND_ARGS[@]}" ./_do_run_test.sh
+else
   # Run in dry-run mode.
-  RELEASE_TINKEY_ARGS+=( -d )
+  ./kokoro/testutils/run_command.sh "${RUN_COMMAND_ARGS[@]}" \
+    ./release_tinkey.sh -d "${RELEASE_VERSION}"
 fi
-readonly RELEASE_TINKEY_ARGS
-
-if [[ "${IS_KOKORO}" == "true" && "${DO_MAKE_RELEASE}" == "true" ]]; then
-  gcloud auth activate-service-account \
-    --key-file="${KOKORO_KEYSTORE_DIR}/70968_tink_tinkey_release_service_key"
-  gcloud config set project tink-test-infrastructure
-fi
-
-./release_tinkey.sh "${RELEASE_TINKEY_ARGS[@]}" "${RELEASE_VERSION}"

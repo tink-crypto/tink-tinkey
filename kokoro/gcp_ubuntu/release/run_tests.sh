@@ -23,7 +23,7 @@
 #   executes tests directly on the host. The CONTAINER_IMAGE variable can be set
 #   to execute tests in a custom container image for local testing. E.g.:
 #
-#   CONTAINER_IMAGE="us-docker.pkg.dev/tink-test-infrastructure/tink-ci-images/linux-tink-java-base:latest" \
+#   CONTAINER_IMAGE="us-docker.pkg.dev/tink-test-infrastructure/tink-ci-images/linux-tink-java-gcloud:latest" \
 #     sh ./kokoro/gcp_ubuntu/release/run_tests.sh
 set -eEuo pipefail
 
