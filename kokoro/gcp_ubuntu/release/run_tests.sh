@@ -71,9 +71,9 @@ gcloud config set project tink-test-infrastructure
 EOF
 
   chmod +x _do_run_test.sh
-  ./kokoro/testutils/run_command.sh "${RUN_COMMAND_ARGS[@]}" ./_do_run_test.sh
+  ./kokoro/testutils/docker_execute.sh "${RUN_COMMAND_ARGS[@]}" ./_do_run_test.sh
 else
   # Run in dry-run mode.
-  ./kokoro/testutils/run_command.sh "${RUN_COMMAND_ARGS[@]}" \
+  ./kokoro/testutils/docker_execute.sh "${RUN_COMMAND_ARGS[@]}" \
     ./release_tinkey.sh -d snapshot
 fi

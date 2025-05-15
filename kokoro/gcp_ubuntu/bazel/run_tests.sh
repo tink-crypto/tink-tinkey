@@ -42,5 +42,5 @@ if [[ -n "${CONTAINER_IMAGE}" ]]; then
 fi
 readonly RUN_COMMAND_ARGS
 
-./kokoro/testutils/run_command.sh "${RUN_COMMAND_ARGS[@]}" \
+./kokoro/testutils/docker_execute.sh "${RUN_COMMAND_ARGS[@]}" \
   ./kokoro/testutils/run_bazel_tests.sh .
