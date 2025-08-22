@@ -15,6 +15,12 @@
 ################################################################################
 
 # Builds and tests Tinkey using Bazel.
+
+# Generated with openssl rand -hex 10
+echo "==========================================================================="
+echo "Tink Script ID: 4d382630b0d36631e663 (to quickly find the script from logs)"
+echo "==========================================================================="
+
 set -euo pipefail
 
 export XCODE_VERSION="14.1"
