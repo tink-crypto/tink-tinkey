@@ -9,17 +9,14 @@ bazel_dep(
     name = "platforms",
     version = "0.0.10",
 )
-
 bazel_dep(
     name = "bazel_skylib",
     version = "1.7.1",
 )
-
 bazel_dep(
     name = "rules_java",
     version = "7.6.5",
 )
-
 bazel_dep(
     name = "rules_jvm_external",
     version = "6.1",
@@ -44,7 +41,6 @@ bazel_dep(
 )
 
 python = use_extension("@rules_python//python/extensions:python.bzl", "python")
-
 python.toolchain(
     configure_coverage_tool = True,
     ignore_root_user_error = True,
@@ -54,20 +50,18 @@ python.toolchain(
 )
 
 maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
-
 maven.install(
     artifacts = [
         "args4j:args4j:2.33",
         "com.google.auto.service:auto-service-annotations:1.1.1",
         "com.google.auto.service:auto-service:1.1.1",
         "com.google.auto:auto-common:1.2.2",
-        "com.google.crypto.tink:tink-awskms:1.9.1",
+        "com.google.crypto.tink:tink-awskms:1.11.0",
         "com.google.crypto.tink:tink-gcpkms:1.10.0",
-        "com.google.crypto.tink:tink:1.15.0",
+        "com.google.crypto.tink:tink:1.18.0",
         "com.google.truth:truth:1.1.5",
         "junit:junit:4.13.2",
     ],
     repositories = ["https://repo1.maven.org/maven2"],
 )
-
 use_repo(maven, "maven")
