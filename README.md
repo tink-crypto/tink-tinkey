@@ -18,8 +18,7 @@ Tinkey is a command line utility for managing Tink
 [keysets](https://developers.google.com/tink/get-started#keysets). It can
 encrypt or decrypt keysets with key encryption keys residing in a remote Key
 Management Service (KMS). Out of the box it supports AWS KMS and Google Cloud
-KMS. Adding support for other KMSs is easy, and doesn't require modifying
-Tinkey.
+KMS. Adding support for other KMSs is easy.
 
 The latest release is 1.12.0.
 
