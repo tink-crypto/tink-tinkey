@@ -109,7 +109,7 @@ build_tinkey() {
   cat <<EOF > tinkey
 #!/usr/bin/env sh
 
-java -jar "\$(dirname "\$(realpath --canonicalize-existing "\$0")")/tinkey_deploy.jar" "\$@"
+java -jar "\$(dirname "\$(realpath "\$0")")/tinkey_deploy.jar" "\$@"
 EOF
 
   cat <<EOF > tinkey.bat
