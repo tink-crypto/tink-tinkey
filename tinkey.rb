@@ -6,8 +6,8 @@
 class Tinkey < Formula
   desc "A command line tool to generate and manipulate keysets for the Tink cryptography library"
   homepage "https://github.com/tink-crypto/tink-tinkey"
-  url "https://storage.googleapis.com/tinkey/tinkey-1.12.0.tar.gz"
-  sha256 "9d908b457a2c0612fafd18bb351e05bbe85f604c5b9abe61809f5eb06280fc56"
+  url "https://storage.googleapis.com/tinkey/tinkey-1.13.0.tar.gz"
+  sha256 "293010ccc0adcbb51a19ca51bb67f6aea8a849ac8c6dabc2544087d79122226f"
 
   def install
     bin.install "tinkey"
