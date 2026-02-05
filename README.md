@@ -20,7 +20,7 @@ encrypt or decrypt keysets with key encryption keys residing in a remote Key
 Management Service (KMS). Out of the box it supports AWS KMS and Google Cloud
 KMS. Adding support for other KMSs is easy.
 
-The latest release is 1.12.0.
+The latest release is 1.13.0.
 
 The official documentation is available at
 https://developers.google.com/tink/tinkey-overview.
