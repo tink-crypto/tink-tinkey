@@ -126,7 +126,7 @@ upload_to_gcs() {
 
   shasum -a 256 "tinkey-${VERSION}.tar.gz"
 
-  do_if_not_dry_run gsutil cp "tinkey-${VERSION}.tar.gz" "${GCS_LOCATION}"
+  do_if_not_dry_run gcloud storage cp "tinkey-${VERSION}.tar.gz" "${GCS_LOCATION}"
 }
 
 main() {
