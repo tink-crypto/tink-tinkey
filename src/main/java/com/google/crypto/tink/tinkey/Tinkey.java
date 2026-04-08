@@ -18,7 +18,6 @@ package com.google.crypto.tink.tinkey;
 
 import com.google.crypto.tink.daead.DeterministicAeadConfig;
 import com.google.crypto.tink.hybrid.HybridConfig;
-import com.google.crypto.tink.integration.awskms.AwsKmsClient;
 import com.google.crypto.tink.integration.gcpkms.GcpKmsClient;
 import com.google.crypto.tink.jwt.JwtMacConfig;
 import com.google.crypto.tink.jwt.JwtSignatureConfig;
@@ -28,10 +27,10 @@ import com.google.crypto.tink.signature.SignatureConfig;
 import com.google.crypto.tink.streamingaead.StreamingAeadConfig;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
+import com.google.crypto.tink.integration.awskms.AwsKmsClient;
 
-/**
- * Tinkey is a command-line tool to manage keys for Tink.
- */
+
+/** Tinkey is a command-line tool to manage keys for Tink. */
 public final class Tinkey {
   public static void main(String[] args) throws Exception {
     DeterministicAeadConfig.register();
@@ -44,8 +43,8 @@ public final class Tinkey {
     KeyDerivationConfig.register();
     // Placeholder for Internal Prps. DO NOT EDIT.
 
-    KmsClientsFactory.globalInstance().addFactory(AwsKmsClient::new);
     KmsClientsFactory.globalInstance().addFactory(GcpKmsClient::new);
+    KmsClientsFactory.globalInstance().addFactory(AwsKmsClient::new);
 
     TinkeyCommands commands = new TinkeyCommands();
     CmdLineParser parser = new CmdLineParser(commands);
