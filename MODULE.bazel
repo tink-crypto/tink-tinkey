@@ -21,6 +21,10 @@ bazel_dep(
     name = "rules_jvm_external",
     version = "6.1",
 )
+bazel_dep(
+    name = "rules_shell",
+    version = "0.8.0",
+)
 
 # Overriding to a commit that doesn't check for Java version. This is to avoid version parsing [1]
 # which may fail [2]. Note that since [1] rules_jvm_external requires Java 11.
