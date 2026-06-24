@@ -16,6 +16,7 @@
 
 package com.google.crypto.tink.tinkey;
 
+import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.OptionDef;
 import org.kohsuke.args4j.spi.OneArgumentOptionHandler;
@@ -28,7 +29,14 @@ public class KeyIdHandler extends OneArgumentOptionHandler<Integer> {
   }
 
   @Override
-  protected Integer parse(String argument) {
-    return Integer.parseUnsignedInt(argument);
+  protected Integer parse(String argument) throws CmdLineException {
+    try {
+      return Integer.parseUnsignedInt(argument);
+    } catch (NumberFormatException e) {
+      throw new CmdLineException(
+          owner,
+          "\"" + argument + "\" is not a valid unsigned 32-bit key ID",
+          e);
+    }
   }
 }
