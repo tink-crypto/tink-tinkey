@@ -5,53 +5,12 @@ module(
     version = "1.13.0",
 )
 
-bazel_dep(
-    name = "platforms",
-    version = "0.0.10",
-)
-bazel_dep(
-    name = "bazel_skylib",
-    version = "1.7.1",
-)
-bazel_dep(
-    name = "rules_java",
-    version = "7.6.5",
-)
-bazel_dep(
-    name = "rules_jvm_external",
-    version = "6.1",
-)
-bazel_dep(
-    name = "rules_shell",
-    version = "0.8.0",
-)
-
-# Overriding to a commit that doesn't check for Java version. This is to avoid version parsing [1]
-# which may fail [2]. Note that since [1] rules_jvm_external requires Java 11.
-#
-# [1] https://github.com/bazelbuild/rules_jvm_external/commit/4f56f7cec2fa3a47e34d48b8f6293785cfad7e3a
-# [2] https://github.com/bazelbuild/rules_jvm_external/issues/1115
-# Commit from Apr 29, 2024.
-git_override(
-    module_name = "rules_jvm_external",
-    commit = "4f56f7cec2fa3a47e34d48b8f6293785cfad7e3a",
-    remote = "https://github.com/bazelbuild/rules_jvm_external",
-)
-
-# This is needed to overwrite rules_jvm_external's toolchain to allow running with `root` as user.
-bazel_dep(
-    name = "rules_python",
-    version = "0.33.2",
-)
-
-python = use_extension("@rules_python//python/extensions:python.bzl", "python")
-python.toolchain(
-    configure_coverage_tool = True,
-    ignore_root_user_error = True,
-    # Only set when you have mulitple toolchain versions.
-    is_default = True,
-    python_version = "3.11",
-)
+bazel_dep(name = "platforms", version = "1.1.0")
+bazel_dep(name = "bazel_skylib", version = "1.9.0")
+bazel_dep(name = "rules_java", version = "9.6.1")
+bazel_dep(name = "rules_jvm_external", version = "7.0")
+bazel_dep(name = "rules_android", version = "0.7.3")
+bazel_dep(name = "rules_shell", version = "0.8.0")
 
 maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
 maven.install(
@@ -61,11 +20,30 @@ maven.install(
         "com.google.auto.service:auto-service:1.1.1",
         "com.google.auto:auto-common:1.2.2",
         "com.google.crypto.tink:tink-awskms:2.0.0",
-        "com.google.crypto.tink:tink-gcpkms:1.10.0",
-        "com.google.crypto.tink:tink:1.21.0",
-        "com.google.truth:truth:1.1.5",
+        "com.google.crypto.tink:tink-gcpkms:1.11.0",
+        "com.google.crypto.tink:tink:1.22.0",
+        "com.google.truth:truth:1.4.5",
         "junit:junit:4.13.2",
     ],
+    known_contributing_modules = ["protobuf"],
     repositories = ["https://repo1.maven.org/maven2"],
 )
 use_repo(maven, "maven")
+
+remote_android_extensions = use_extension(
+    "@rules_android//bzlmod_extensions:android_extensions.bzl",
+    "remote_android_tools_extensions",
+)
+use_repo(remote_android_extensions, "android_tools")
+
+android_sdk_repository_extension = use_extension("@rules_android//rules/android_sdk_repository:rule.bzl", "android_sdk_repository_extension")
+use_repo(android_sdk_repository_extension, "androidsdk")
+
+# TODO - b/447329832: Switch to API level 24.
+# This will search in ANDROID_HOME.
+android_sdk_repository_extension.configure(
+    api_level = 30,
+    build_tools_version = "35.0.0",
+)
+
+register_toolchains("@androidsdk//:sdk-toolchain", "@androidsdk//:all")
