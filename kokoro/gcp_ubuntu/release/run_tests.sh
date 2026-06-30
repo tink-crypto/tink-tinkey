@@ -39,24 +39,37 @@ if [[ -n "${KOKORO_ARTIFACTS_DIR:-}" ]] ; then
 fi
 readonly IS_KOKORO
 
+DOCKER_EXECUTE_ARGS=()
+
 if [[ "${IS_KOKORO}" == "true" ]]; then
   readonly TINK_BASE_DIR="$(echo "${KOKORO_ARTIFACTS_DIR}"/git*)"
   cd "${TINK_BASE_DIR}/tink_tinkey"
   source "./kokoro/testutils/java_test_container_images.sh"
   CONTAINER_IMAGE="${TINK_JAVA_BASE_IMAGE}"
-  RUN_COMMAND_ARGS+=( -k "${TINK_GCR_SERVICE_KEY}" )
+  DOCKER_EXECUTE_ARGS+=( -k "${TINK_GCR_SERVICE_KEY}" )
 fi
 readonly CONTAINER_IMAGE
 
 if [[ -n "${CONTAINER_IMAGE:-}" ]]; then
-  RUN_COMMAND_ARGS+=( -c "${CONTAINER_IMAGE}" )
+  DOCKER_EXECUTE_ARGS+=( -c "${CONTAINER_IMAGE}" )
 fi
+
+# Make sure we set ANDROID_HOME to an empty value so `rules_android`, which is
+# transitively required by `rules_jvm_external`, doesn't try to use the Android
+# SDK. See
+# https://github.com/bazelbuild/rules_android/blob/ac6c4254424850a73b63ae5029f1ab5096e108c7/rules/android_sdk_repository/rule.bzl#L114-L117.
+cat <<EOF > _env.txt
+ANDROID_HOME=
+EOF
+DOCKER_EXECUTE_ARGS+=( -e _env.txt )
+
+readonly DOCKER_EXECUTE_ARGS
 
 # Run cleanup on EXIT.
 trap cleanup EXIT
 
 cleanup() {
-  rm -rf _do_run_test.sh
+  rm -rf _do_run_test.sh _env.txt
 }
 
 readonly CONTINUOUS_JOB_NAME="tink/github/tinkey/gcp_ubuntu/release/continuous"
@@ -67,7 +80,7 @@ if [[ "${IS_KOKORO}" == "true" \
   cp "${KOKORO_KEYSTORE_DIR}/70968_tink_tinkey_release_service_key" \
     release_service_key
 
-cat <<EOF > _do_run_test.sh
+  cat <<EOF > _do_run_test.sh
 #!/bin/bash
 set -euo pipefail
 
@@ -77,9 +90,10 @@ gcloud config set project tink-test-infrastructure
 EOF
 
   chmod +x _do_run_test.sh
-  ./kokoro/testutils/docker_execute.sh "${RUN_COMMAND_ARGS[@]}" ./_do_run_test.sh
+  ./kokoro/testutils/docker_execute.sh "${DOCKER_EXECUTE_ARGS[@]}" \
+    ./_do_run_test.sh
 else
   # Run in dry-run mode.
-  ./kokoro/testutils/docker_execute.sh "${RUN_COMMAND_ARGS[@]}" \
+  ./kokoro/testutils/docker_execute.sh "${DOCKER_EXECUTE_ARGS[@]}" \
     ./release_tinkey.sh -d snapshot
 fi

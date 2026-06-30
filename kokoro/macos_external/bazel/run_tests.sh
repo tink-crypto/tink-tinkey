@@ -32,4 +32,10 @@ if [[ -n "${KOKORO_ROOT:-}" ]]; then
   export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-11-latest/Contents/Home
 fi
 
+# Make sure we set ANDROID_HOME to an empty value so `rules_android`, which is
+# transitively required by `rules_jvm_external`, doesn't try to use the Android
+# SDK. See
+# https://github.com/bazelbuild/rules_android/blob/ac6c4254424850a73b63ae5029f1ab5096e108c7/rules/android_sdk_repository/rule.bzl#L114-L117.
+export ANDROID_HOME=""
+
 ./kokoro/testutils/run_bazel_tests.sh .

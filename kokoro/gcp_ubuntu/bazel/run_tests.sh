@@ -33,20 +33,30 @@ echo "==========================================================================
 
 set -eEuo pipefail
 
-RUN_COMMAND_ARGS=()
+DOCKER_EXECUTE_ARGS=()
 if [[ -n "${KOKORO_ROOT:-}" ]]; then
   readonly TINK_BASE_DIR="$(echo "${KOKORO_ARTIFACTS_DIR}"/git*)"
   cd "${TINK_BASE_DIR}/tink_tinkey"
   source "./kokoro/testutils/java_test_container_images.sh"
   CONTAINER_IMAGE="${TINK_JAVA_BASE_IMAGE}"
-  RUN_COMMAND_ARGS+=( -k "${TINK_GCR_SERVICE_KEY}" )
+  DOCKER_EXECUTE_ARGS+=( -k "${TINK_GCR_SERVICE_KEY}" )
 fi
 readonly CONTAINER_IMAGE
 
 if [[ -n "${CONTAINER_IMAGE}" ]]; then
-  RUN_COMMAND_ARGS+=( -c "${CONTAINER_IMAGE}" )
+  DOCKER_EXECUTE_ARGS+=( -c "${CONTAINER_IMAGE}" )
 fi
-readonly RUN_COMMAND_ARGS
 
-./kokoro/testutils/docker_execute.sh "${RUN_COMMAND_ARGS[@]}" \
+# Make sure we set ANDROID_HOME to an empty value so `rules_android`, which is
+# transitively required by `rules_jvm_external`, doesn't try to use the Android
+# SDK. See
+# https://github.com/bazelbuild/rules_android/blob/ac6c4254424850a73b63ae5029f1ab5096e108c7/rules/android_sdk_repository/rule.bzl#L114-L117.
+cat <<EOF > _env.txt
+ANDROID_HOME=
+EOF
+DOCKER_EXECUTE_ARGS+=( -e _env.txt )
+
+readonly DOCKER_EXECUTE_ARGS
+
+./kokoro/testutils/docker_execute.sh "${DOCKER_EXECUTE_ARGS[@]}" \
   ./kokoro/testutils/run_bazel_tests.sh .
