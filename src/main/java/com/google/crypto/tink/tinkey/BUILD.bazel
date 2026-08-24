@@ -46,6 +46,7 @@ java_library(
         "@maven//:com_google_crypto_tink_tink",
         "@maven//:com_google_crypto_tink_tink_awskms",
         "@maven//:com_google_crypto_tink_tink_gcpkms",
+        "@maven//:org_conscrypt_conscrypt_openjdk_uber",
     ],
 )
 
@@ -124,8 +125,8 @@ java_library(
     name = "key_id_options",
     srcs = ["KeyIdOptions.java"],
     deps = [
-        ":out_options",
         ":key_id_handler",
+        ":out_options",
         "@maven//:args4j_args4j",
     ],
 )

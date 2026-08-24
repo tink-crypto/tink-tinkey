@@ -23,20 +23,39 @@ import com.google.crypto.tink.jwt.JwtMacConfig;
 import com.google.crypto.tink.jwt.JwtSignatureConfig;
 import com.google.crypto.tink.keyderivation.KeyDerivationConfig;
 import com.google.crypto.tink.prf.PrfConfig;
+import com.google.crypto.tink.signature.MlDsaSignKeyManager;
 import com.google.crypto.tink.signature.SignatureConfig;
+import com.google.crypto.tink.signature.SlhDsaSignKeyManager;
+import com.google.crypto.tink.signature.internal.MlDsaSignConscrypt;
+import com.google.crypto.tink.signature.internal.SlhDsaSignConscrypt;
 import com.google.crypto.tink.streamingaead.StreamingAeadConfig;
+import java.security.Security;
+import org.conscrypt.Conscrypt;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
-import com.google.crypto.tink.integration.awskms.AwsKmsClient;
 
+import com.google.crypto.tink.integration.awskms.AwsKmsClient;
 
 /** Tinkey is a command-line tool to manage keys for Tink. */
 public final class Tinkey {
   public static void main(String[] args) throws Exception {
+    try {
+      Conscrypt.checkAvailability();
+      Security.addProvider(Conscrypt.newProvider());
+    } catch (Throwable cause) {
+      // Conscrypt is optional if not using algorithms requiring it.
+    }
+
     DeterministicAeadConfig.register();
     HybridConfig.register(); // includes Aead and Mac
     PrfConfig.register();
     SignatureConfig.register();
+    if (MlDsaSignConscrypt.isSupported()) {
+      MlDsaSignKeyManager.registerPair();
+    }
+    if (SlhDsaSignConscrypt.isSupported()) {
+      SlhDsaSignKeyManager.registerPair();
+    }
     StreamingAeadConfig.register();
     JwtSignatureConfig.register();
     JwtMacConfig.register();

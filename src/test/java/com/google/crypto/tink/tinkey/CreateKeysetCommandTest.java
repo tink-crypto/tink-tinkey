@@ -21,6 +21,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.crypto.tink.Aead;
 import com.google.crypto.tink.InsecureSecretKeyAccess;
+import com.google.crypto.tink.KeyTemplates;
 import com.google.crypto.tink.KeysetHandle;
 import com.google.crypto.tink.RegistryConfiguration;
 import com.google.crypto.tink.TinkJsonProtoKeysetFormat;
@@ -28,18 +29,27 @@ import com.google.crypto.tink.TinkProtoKeysetFormat;
 import com.google.crypto.tink.aead.AeadConfig;
 import com.google.crypto.tink.aead.PredefinedAeadParameters;
 import com.google.crypto.tink.mac.MacConfig;
-import com.google.crypto.tink.mac.PredefinedMacParameters;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.experimental.theories.DataPoints;
+import org.junit.experimental.theories.FromDataPoints;
+import org.junit.experimental.theories.Theories;
+import org.junit.experimental.theories.Theory;
 import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
 /** Tests for {@code CreateKeysetCommand}. */
-@RunWith(JUnit4.class)
+@RunWith(Theories.class)
 public class CreateKeysetCommandTest {
+  @DataPoints("templates")
+  public static final String[] templates =
+      new String[] {
+        "HMAC_SHA256_128BITTAG",
+        "ML_DSA_44",
+        "SLH_DSA_SHA2_128S_RAW",
+      };
+
   @BeforeClass
   public static void setUp() throws Exception {
     AeadConfig.register();
@@ -47,14 +57,15 @@ public class CreateKeysetCommandTest {
     KmsClientsFactory.globalInstance().addFactory(TinkeyTestKmsClient::new);
   }
 
-  @Test
-  public void testCreateCleartext_shouldCreateNewKeyset() throws Exception {
+  @Theory
+  public void testCreateCleartext_shouldCreateNewKeyset(
+      @FromDataPoints("templates") String templateName) throws Exception {
     Path path = Files.createTempDirectory(/* prefix= */ "");
     Path outputFile = Paths.get(path.toString(), "keyset");
 
     Tinkey.main(
         new String[] {
-          "create-keyset", "--key-template", "HMAC_SHA256_128BITTAG", "--out", outputFile.toString()
+          "create-keyset", "--key-template", templateName, "--out", outputFile.toString()
         });
 
     KeysetHandle handle =
@@ -63,18 +74,19 @@ public class CreateKeysetCommandTest {
 
     assertThat(handle.size()).isEqualTo(1);
     assertThat(handle.getPrimary().getKey().getParameters())
-        .isEqualTo(PredefinedMacParameters.HMAC_SHA256_128BITTAG);
+        .isEqualTo(KeyTemplates.get(templateName).toParameters());
   }
 
-  @Test
-  public void testCreateCleartext_explicitJson_shouldCreateNewKeyset() throws Exception {
+  @Theory
+  public void testCreateCleartext_explicitJson_shouldCreateNewKeyset(
+      @FromDataPoints("templates") String templateName) throws Exception {
     Path path = Files.createTempDirectory(/* prefix= */ "");
     Path outputFile = Paths.get(path.toString(), "keyset");
 
     String commandLine =
         String.format(
-            "create-keyset --key-template HMAC_SHA256_128BITTAG --out-format json --out %s",
-            outputFile.toString());
+            "create-keyset --key-template %s --out-format json --out %s",
+            templateName, outputFile.toString());
 
     Tinkey.main(commandLine.split(" "));
 
@@ -84,18 +96,19 @@ public class CreateKeysetCommandTest {
 
     assertThat(handle.size()).isEqualTo(1);
     assertThat(handle.getPrimary().getKey().getParameters())
-        .isEqualTo(PredefinedMacParameters.HMAC_SHA256_128BITTAG);
+        .isEqualTo(KeyTemplates.get(templateName).toParameters());
   }
 
-  @Test
-  public void testCreateCleartext_binary_shouldCreateNewKeyset() throws Exception {
+  @Theory
+  public void testCreateCleartext_binary_shouldCreateNewKeyset(
+      @FromDataPoints("templates") String templateName) throws Exception {
     Path path = Files.createTempDirectory(/* prefix= */ "");
     Path outputFile = Paths.get(path.toString(), "keyset");
 
     String commandLine =
         String.format(
-            "create-keyset --key-template HMAC_SHA256_128BITTAG --out-format binary --out %s",
-            outputFile);
+            "create-keyset --key-template %s --out-format binary --out %s",
+            templateName, outputFile);
 
     Tinkey.main(commandLine.split(" "));
 
@@ -105,11 +118,12 @@ public class CreateKeysetCommandTest {
 
     assertThat(handle.size()).isEqualTo(1);
     assertThat(handle.getPrimary().getKey().getParameters())
-        .isEqualTo(PredefinedMacParameters.HMAC_SHA256_128BITTAG);
+        .isEqualTo(KeyTemplates.get(templateName).toParameters());
   }
 
-  @Test
-  public void testCreateCleartext_withMasterKey_shouldCreateNewKeyset() throws Exception {
+  @Theory
+  public void testCreateCleartext_withMasterKey_shouldCreateNewKeyset(
+      @FromDataPoints("templates") String templateName) throws Exception {
     Path path = Files.createTempDirectory(/* prefix= */ "");
     Path outputFile = Paths.get(path.toString(), "keyset");
     Path credentialFile = Paths.get(path.toString(), "credentials");
@@ -122,11 +136,11 @@ public class CreateKeysetCommandTest {
 
     String commandLine =
         String.format(
-            "create-keyset --key-template HMAC_SHA256_128BITTAG --out-format binary "
+            "create-keyset --key-template %s --out-format binary "
                 + "--master-key-uri %s "
                 + "--credential %s "
                 + "--out %s",
-            masterKeyUri, credentialFile, outputFile.toString());
+            templateName, masterKeyUri, credentialFile, outputFile.toString());
 
     Tinkey.main(commandLine.split(" "));
 
@@ -136,12 +150,12 @@ public class CreateKeysetCommandTest {
 
     assertThat(handle.size()).isEqualTo(1);
     assertThat(handle.getPrimary().getKey().getParameters())
-        .isEqualTo(PredefinedMacParameters.HMAC_SHA256_128BITTAG);
+        .isEqualTo(KeyTemplates.get(templateName).toParameters());
   }
 
-  @Test
-  public void testCreateCleartext_withMasterKey_jsonFormat_shouldCreateNewKeyset()
-      throws Exception {
+  @Theory
+  public void testCreateCleartext_withMasterKey_jsonFormat_shouldCreateNewKeyset(
+      @FromDataPoints("templates") String templateName) throws Exception {
     Path path = Files.createTempDirectory(/* prefix= */ "");
     Path outputFile = Paths.get(path.toString(), "keyset");
     Path credentialFile = Paths.get(path.toString(), "credentials");
@@ -154,11 +168,11 @@ public class CreateKeysetCommandTest {
 
     String commandLine =
         String.format(
-            "create-keyset --key-template HMAC_SHA256_128BITTAG --out-format json "
+            "create-keyset --key-template %s --out-format json "
                 + "--master-key-uri %s "
                 + "--credential %s "
                 + "--out %s",
-            masterKeyUri, credentialFile, outputFile.toString());
+            templateName, masterKeyUri, credentialFile, outputFile.toString());
 
     Tinkey.main(commandLine.split(" "));
 
@@ -168,7 +182,6 @@ public class CreateKeysetCommandTest {
 
     assertThat(handle.size()).isEqualTo(1);
     assertThat(handle.getPrimary().getKey().getParameters())
-        .isEqualTo(PredefinedMacParameters.HMAC_SHA256_128BITTAG);
+        .isEqualTo(KeyTemplates.get(templateName).toParameters());
   }
-
 }
