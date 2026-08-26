@@ -23,6 +23,7 @@ import com.google.crypto.tink.jwt.JwtMacConfig;
 import com.google.crypto.tink.jwt.JwtSignatureConfig;
 import com.google.crypto.tink.keyderivation.KeyDerivationConfig;
 import com.google.crypto.tink.prf.PrfConfig;
+// Placeholder for internal PRP import. DO NOT EDIT.
 import com.google.crypto.tink.signature.MlDsaSignKeyManager;
 import com.google.crypto.tink.signature.SignatureConfig;
 import com.google.crypto.tink.signature.SlhDsaSignKeyManager;
@@ -60,7 +61,7 @@ public final class Tinkey {
     JwtSignatureConfig.register();
     JwtMacConfig.register();
     KeyDerivationConfig.register();
-    // Placeholder for Internal Prps. DO NOT EDIT.
+    // Placeholder for internal PRP registration. DO NOT EDIT.
 
     KmsClientsFactory.globalInstance().addFactory(GcpKmsClient::new);
     KmsClientsFactory.globalInstance().addFactory(AwsKmsClient::new);
