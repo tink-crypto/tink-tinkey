@@ -18,6 +18,7 @@ package com.google.crypto.tink.tinkey;
 
 import static com.google.common.truth.Truth.assertThat;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import com.google.crypto.tink.Aead;
@@ -204,6 +205,48 @@ public final class ConvertKeysetCommandTest {
           masterKeyUri,
           "--credential",
           credentialFile.toString(),
+          "--new-master-key-uri",
+          masterKeyUri,
+          "--new-credential",
+          credentialFile.toString(),
+        });
+
+    KeysetHandle outputKeyset =
+        TinkJsonProtoKeysetFormat.parseEncryptedKeyset(
+            new String(Files.readAllBytes(outputFile), UTF_8), masterKeyAead, new byte[] {});
+
+    assertThat(outputKeyset.size()).isEqualTo(inputKeyset.size());
+    for (int i = 0; i < inputKeyset.size(); i++) {
+      assertTrue(outputKeyset.getAt(i).getKey().equalsKey(inputKeyset.getAt(i).getKey()));
+    }
+  }
+
+  @Test
+  public void testConvertKeyset_encryptedBinary2JsonWithAllowCleartextOutput_works()
+      throws Exception {
+    Path inputFile = Paths.get(tempDirectory.toString(), "input");
+    Path outputFile = Paths.get(tempDirectory.toString(), "output");
+
+    KeysetHandle inputKeyset = createArbitraryKeyset();
+    byte[] serializedKeyset =
+        TinkProtoKeysetFormat.serializeEncryptedKeyset(inputKeyset, masterKeyAead, new byte[] {});
+    Files.write(inputFile, serializedKeyset);
+    Tinkey.main(
+        new String[] {
+          "convert-keyset",
+          "--in",
+          inputFile.toString(),
+          "--out",
+          outputFile.toString(),
+          "--in-format",
+          "binary",
+          "--out-format",
+          "json",
+          "--master-key-uri",
+          masterKeyUri,
+          "--credential",
+          credentialFile.toString(),
+          "--allow-cleartext-output",
         });
 
     KeysetHandle outputKeyset =
@@ -214,5 +257,37 @@ public final class ConvertKeysetCommandTest {
     for (int i = 0; i < inputKeyset.size(); i++) {
       assertTrue(outputKeyset.getAt(i).getKey().equalsKey(inputKeyset.getAt(i).getKey()));
     }
+  }
+
+  @Test
+  public void testConvertKeyset_encryptedBinary2JsonWithoutAllowCleartextOutput_fails()
+      throws Exception {
+    Path inputFile = Paths.get(tempDirectory.toString(), "input");
+    Path outputFile = Paths.get(tempDirectory.toString(), "output");
+
+    KeysetHandle inputKeyset = createArbitraryKeyset();
+    byte[] serializedKeyset =
+        TinkProtoKeysetFormat.serializeEncryptedKeyset(inputKeyset, masterKeyAead, new byte[] {});
+    Files.write(inputFile, serializedKeyset);
+    assertThrows(
+        Exception.class,
+        () ->
+            Tinkey.main(
+                new String[] {
+                  "convert-keyset",
+                  "--in",
+                  inputFile.toString(),
+                  "--out",
+                  outputFile.toString(),
+                  "--in-format",
+                  "binary",
+                  "--out-format",
+                  "json",
+                  "--master-key-uri",
+                  masterKeyUri,
+                  "--credential",
+                  credentialFile.toString(),
+                }));
+    assertThat(Files.readAllBytes(outputFile)).isEmpty();
   }
 }

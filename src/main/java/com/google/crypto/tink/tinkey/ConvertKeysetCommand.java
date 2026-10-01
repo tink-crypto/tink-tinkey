@@ -36,12 +36,13 @@ public class ConvertKeysetCommand extends ConvertKeysetOptions implements Comman
   /**
    * Changes format, encrypts or decrypts a keyset.
    *
-   * <p>The keyset is read from {@code inputStream}. Its format can be either <code>json</code>
-   * or <code>binary</code>, and is specified by {@code inFormat}. The new key is generated
-   * from template {@code keyTemplate}. If the input keyset is encrypted, use
-   * {@code masterKeyUri} and {@code credentialPath} to decrypt. The output keyset
-   * is written to {@code outputStream} in {@code outFormat}, and encrypted if the
-   * input keyset is encrypted.
+   * <p>The keyset is read from {@code inputStream}. Its format can be either <code>json</code> or
+   * <code>binary</code>, and is specified by {@code inFormat}. If the input keyset is encrypted,
+   * use {@code masterKeyUri} and {@code credentialPath} to decrypt. The output keyset is written to
+   * {@code outputStream} in {@code outFormat}. Output encryption is governed by {@code
+   * --new-master-key-uri} ({@code newMasterKeyUri}) alone: the output keyset is encrypted with
+   * {@code newMasterKeyUri} and {@code newCredentialPath} if {@code newMasterKeyUri} is specified,
+   * and written in cleartext otherwise.
    *
    * @throws GeneralSecurityException if cannot encrypt/decrypt the keyset
    * @throws IOException if cannot read/write the keyset

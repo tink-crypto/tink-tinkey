@@ -33,11 +33,23 @@ class ConvertKeysetOptions extends OutOptions {
       usage = "The new master key credential, must exist if specified")
   String newCredentialPath;
 
+  @Option(
+      name = "--allow-cleartext-output",
+      required = false,
+      usage =
+          "Allow writing a cleartext keyset when the input keyset was encrypted with a master key")
+  boolean allowCleartextOutput;
+
   @Override
   void validate() throws IOException {
     super.validate();
     if (newCredentialPath != null) {
       Validators.validateExists(new File(newCredentialPath));
+    }
+    if (masterKeyUri != null && newMasterKeyUri == null && !allowCleartextOutput) {
+      throw new IllegalArgumentException(
+          "--new-master-key-uri or --allow-cleartext-output must be specified when"
+              + " --master-key-uri is specified");
     }
   }
 }
