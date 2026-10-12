@@ -28,8 +28,6 @@ public class HelpCommand implements Command {
     System.out.println("  create-public-keyset: Creates a public keyset from a private keyset.");
     System.out.println("  list-key-templates:   Lists all supported key templates.");
     System.out.println("  delete-key:           Deletes a specified key in a keyset.");
-    System.out.println(
-        "  destroy-key:          Destroys the key material of a specified key in a keyset.");
     System.out.println("  disable-key:          Disables a specified key in a keyset.");
     System.out.println("  enable-key:           Enables a specified key in a keyset.");
     System.out.println("  list-keyset:          Lists keys in a keyset.");

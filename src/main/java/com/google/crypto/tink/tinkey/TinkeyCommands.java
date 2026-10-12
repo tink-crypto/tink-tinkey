@@ -37,7 +37,6 @@ public final class TinkeyCommands {
     @SubCommand(name = "create-keyset", impl = CreateKeysetCommand.class),
     @SubCommand(name = "create-public-keyset", impl = CreatePublicKeysetCommand.class),
     @SubCommand(name = "delete-key", impl = DeleteKeyCommand.class),
-    @SubCommand(name = "destroy-key", impl = DestroyKeyCommand.class),
     @SubCommand(name = "disable-key", impl = DisableKeyCommand.class),
     @SubCommand(name = "enable-key", impl = EnableKeyCommand.class),
     @SubCommand(name = "list-keyset", impl = ListKeysetCommand.class),

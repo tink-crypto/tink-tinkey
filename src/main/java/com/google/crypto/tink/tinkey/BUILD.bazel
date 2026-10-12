@@ -60,7 +60,6 @@ java_library(
         ":create_keyset_command",
         ":create_public_keyset_command",
         ":delete_key_command",
-        ":destroy_key_command",
         ":disable_key_command",
         ":enable_key_command",
         ":help_command",
@@ -189,16 +188,6 @@ java_library(
 java_library(
     name = "delete_key_command",
     srcs = ["DeleteKeyCommand.java"],
-    deps = [
-        ":command",
-        ":key_id_options",
-        ":tinkey_util",
-    ],
-)
-
-java_library(
-    name = "destroy_key_command",
-    srcs = ["DestroyKeyCommand.java"],
     deps = [
         ":command",
         ":key_id_options",

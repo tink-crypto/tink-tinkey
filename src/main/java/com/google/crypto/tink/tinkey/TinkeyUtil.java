@@ -45,7 +45,6 @@ final class TinkeyUtil {
     CREATE_PUBLIC_KEYSET,
     LIST_KEY_TEMPLATES,
     DELETE_KEY,
-    DESTROY_KEY,
     DISABLE_KEY,
     ENABLE_KEY,
     LIST_KEYSET,
@@ -105,9 +104,6 @@ final class TinkeyUtil {
     switch (type) {
       case DELETE_KEY:
         manager = manager.delete(keyId);
-        break;
-      case DESTROY_KEY:
-        manager = manager.destroy(keyId);
         break;
       case DISABLE_KEY:
         manager = manager.disable(keyId);

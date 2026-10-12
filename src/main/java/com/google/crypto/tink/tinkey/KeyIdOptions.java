@@ -18,7 +18,7 @@ package com.google.crypto.tink.tinkey;
 
 import org.kohsuke.args4j.Option;
 
-/** Options for commands that take a key id option, e.g., enable, disable or destroy. */
+/** Options for commands that take a key id option, e.g., enable, disable, or delete. */
 class KeyIdOptions extends OutOptions {
   @Option(
       name = "--key-id",
