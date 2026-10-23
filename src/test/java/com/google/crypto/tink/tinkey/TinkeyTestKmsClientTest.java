@@ -51,7 +51,9 @@ public final class TinkeyTestKmsClientTest {
     Path credentialPath = Paths.get(directory.toString(), "credentials");
     Files.write(credentialPath, "VALID CREDENTIALS".getBytes(UTF_8));
 
-    KeysetHandle handle = KeysetHandle.generateNew(PredefinedAeadParameters.AES128_GCM);
+    KeysetHandle handle =
+        KeysetHandle.generateNew(
+            PredefinedAeadParameters.AES128_GCM, RegistryConfiguration.get());
     String masterKeyUri = TinkeyTestKmsClient.createKeyUri(handle);
     Aead masterKey =
         new TinkeyTestKmsClient().withCredentials(credentialPath.toString()).getAead(masterKeyUri);
@@ -76,7 +78,9 @@ public final class TinkeyTestKmsClientTest {
     Path credentialPath = Paths.get(directory.toString(), "credentials");
     Files.write(credentialPath, "these are not valid credentials".getBytes(UTF_8));
 
-    KeysetHandle handle = KeysetHandle.generateNew(PredefinedAeadParameters.AES128_GCM);
+    KeysetHandle handle =
+        KeysetHandle.generateNew(
+            PredefinedAeadParameters.AES128_GCM, RegistryConfiguration.get());
     String masterKeyUri = TinkeyTestKmsClient.createKeyUri(handle);
     KmsClient client = new TinkeyTestKmsClient().withCredentials(credentialPath.toString());
     assertThrows(GeneralSecurityException.class, () -> client.getAead(masterKeyUri));
@@ -84,7 +88,9 @@ public final class TinkeyTestKmsClientTest {
 
   @Test
   public void test_clientCannotBeUsedWithoutCallingWithCredential_throws() throws Exception {
-    KeysetHandle handle = KeysetHandle.generateNew(PredefinedAeadParameters.AES128_GCM);
+    KeysetHandle handle =
+        KeysetHandle.generateNew(
+            PredefinedAeadParameters.AES128_GCM, RegistryConfiguration.get());
     String masterKeyUri = TinkeyTestKmsClient.createKeyUri(handle);
     KmsClient client = new TinkeyTestKmsClient();
 
@@ -97,7 +103,9 @@ public final class TinkeyTestKmsClientTest {
     Path credentialPath = Paths.get(directory.toString(), "credentials");
     Files.write(credentialPath, "VALID CREDENTIALS".getBytes(UTF_8));
 
-    KeysetHandle handle = KeysetHandle.generateNew(PredefinedAeadParameters.AES128_GCM);
+    KeysetHandle handle =
+        KeysetHandle.generateNew(
+            PredefinedAeadParameters.AES128_GCM, RegistryConfiguration.get());
     String masterKeyUri = TinkeyTestKmsClient.createKeyUri(handle);
     Aead masterKey =
         KmsClientsFactory.globalInstance()

@@ -62,7 +62,9 @@ public final class ConvertKeysetCommandTest {
     credentialFile = Paths.get(tempDirectory.toString(), "credentials");
     TinkeyTestKmsClient.createCredentialFile(credentialFile);
 
-    masterKeyAeadKeyset = KeysetHandle.generateNew(PredefinedAeadParameters.AES128_GCM);
+    masterKeyAeadKeyset =
+        KeysetHandle.generateNew(
+            PredefinedAeadParameters.AES128_GCM, RegistryConfiguration.get());
     masterKeyAead = masterKeyAeadKeyset.getPrimitive(RegistryConfiguration.get(), Aead.class);
     masterKeyUri = TinkeyTestKmsClient.createKeyUri(masterKeyAeadKeyset);
   }
@@ -104,7 +106,9 @@ public final class ConvertKeysetCommandTest {
 
     KeysetHandle outputKeyset =
         TinkProtoKeysetFormat.parseKeyset(
-            Files.readAllBytes(outputFile), InsecureSecretKeyAccess.get());
+            Files.readAllBytes(outputFile),
+            InsecureSecretKeyAccess.get(),
+            RegistryConfiguration.get());
 
     assertThat(outputKeyset.size()).isEqualTo(inputKeyset.size());
     for (int i = 0; i < inputKeyset.size(); i++) {
@@ -119,7 +123,8 @@ public final class ConvertKeysetCommandTest {
 
     KeysetHandle inputKeyset = createArbitraryKeyset();
     byte[] serializedKeyset =
-        TinkProtoKeysetFormat.serializeKeyset(inputKeyset, InsecureSecretKeyAccess.get());
+        TinkProtoKeysetFormat.serializeKeyset(
+            inputKeyset, InsecureSecretKeyAccess.get(), RegistryConfiguration.get());
     Files.write(inputFile, serializedKeyset);
 
     Tinkey.main(
@@ -152,7 +157,8 @@ public final class ConvertKeysetCommandTest {
 
     KeysetHandle inputKeyset = createArbitraryKeyset();
     byte[] serializedKeyset =
-        TinkProtoKeysetFormat.serializeKeyset(inputKeyset, InsecureSecretKeyAccess.get());
+        TinkProtoKeysetFormat.serializeKeyset(
+            inputKeyset, InsecureSecretKeyAccess.get(), RegistryConfiguration.get());
     Files.write(inputFile, serializedKeyset);
     Tinkey.main(
         new String[] {
@@ -188,7 +194,8 @@ public final class ConvertKeysetCommandTest {
 
     KeysetHandle inputKeyset = createArbitraryKeyset();
     byte[] serializedKeyset =
-        TinkProtoKeysetFormat.serializeEncryptedKeyset(inputKeyset, masterKeyAead, new byte[] {});
+        TinkProtoKeysetFormat.serializeEncryptedKeyset(
+            inputKeyset, masterKeyAead, new byte[] {}, RegistryConfiguration.get());
     Files.write(inputFile, serializedKeyset);
     Tinkey.main(
         new String[] {
@@ -229,7 +236,8 @@ public final class ConvertKeysetCommandTest {
 
     KeysetHandle inputKeyset = createArbitraryKeyset();
     byte[] serializedKeyset =
-        TinkProtoKeysetFormat.serializeEncryptedKeyset(inputKeyset, masterKeyAead, new byte[] {});
+        TinkProtoKeysetFormat.serializeEncryptedKeyset(
+            inputKeyset, masterKeyAead, new byte[] {}, RegistryConfiguration.get());
     Files.write(inputFile, serializedKeyset);
     Tinkey.main(
         new String[] {
@@ -267,7 +275,8 @@ public final class ConvertKeysetCommandTest {
 
     KeysetHandle inputKeyset = createArbitraryKeyset();
     byte[] serializedKeyset =
-        TinkProtoKeysetFormat.serializeEncryptedKeyset(inputKeyset, masterKeyAead, new byte[] {});
+        TinkProtoKeysetFormat.serializeEncryptedKeyset(
+            inputKeyset, masterKeyAead, new byte[] {}, RegistryConfiguration.get());
     Files.write(inputFile, serializedKeyset);
     assertThrows(
         Exception.class,

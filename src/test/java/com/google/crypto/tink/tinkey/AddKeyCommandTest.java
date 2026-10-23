@@ -55,7 +55,8 @@ public class AddKeyCommandTest {
     Path outputFile = Paths.get(path.toString(), "output");
 
     KeysetHandle inputKeyset =
-        KeysetHandle.generateNew(PredefinedMacParameters.HMAC_SHA256_128BITTAG);
+        KeysetHandle.generateNew(
+            PredefinedMacParameters.HMAC_SHA256_128BITTAG, RegistryConfiguration.get());
     String serializedKeyset =
         TinkJsonProtoKeysetFormat.serializeKeyset(inputKeyset, InsecureSecretKeyAccess.get());
     Files.write(inputFile, serializedKeyset.getBytes(UTF_8));
@@ -90,9 +91,11 @@ public class AddKeyCommandTest {
     Path outputFile = Paths.get(path.toString(), "output");
 
     KeysetHandle inputKeyset =
-        KeysetHandle.generateNew(PredefinedMacParameters.HMAC_SHA256_128BITTAG);
+        KeysetHandle.generateNew(
+            PredefinedMacParameters.HMAC_SHA256_128BITTAG, RegistryConfiguration.get());
     byte[] serializedKeyset =
-        TinkProtoKeysetFormat.serializeKeyset(inputKeyset, InsecureSecretKeyAccess.get());
+        TinkProtoKeysetFormat.serializeKeyset(
+            inputKeyset, InsecureSecretKeyAccess.get(), RegistryConfiguration.get());
     Files.write(inputFile, serializedKeyset);
 
     Tinkey.main(
@@ -112,7 +115,9 @@ public class AddKeyCommandTest {
 
     KeysetHandle handle =
         TinkProtoKeysetFormat.parseKeyset(
-            Files.readAllBytes(outputFile), InsecureSecretKeyAccess.get());
+            Files.readAllBytes(outputFile),
+            InsecureSecretKeyAccess.get(),
+            RegistryConfiguration.get());
 
     assertThat(handle.size()).isEqualTo(2);
     assertThat(handle.getAt(0).getKey().equalsKey(inputKeyset.getAt(0).getKey())).isTrue();
@@ -131,14 +136,17 @@ public class AddKeyCommandTest {
     TinkeyTestKmsClient.createCredentialFile(credentialFile);
 
     KeysetHandle masterKeyAeadKeyset =
-        KeysetHandle.generateNew(PredefinedAeadParameters.AES128_GCM);
+        KeysetHandle.generateNew(
+            PredefinedAeadParameters.AES128_GCM, RegistryConfiguration.get());
     Aead masterKeyAead = masterKeyAeadKeyset.getPrimitive(RegistryConfiguration.get(), Aead.class);
     String masterKeyUri = TinkeyTestKmsClient.createKeyUri(masterKeyAeadKeyset);
 
     KeysetHandle inputKeyset =
-        KeysetHandle.generateNew(PredefinedMacParameters.HMAC_SHA256_128BITTAG);
+        KeysetHandle.generateNew(
+            PredefinedMacParameters.HMAC_SHA256_128BITTAG, RegistryConfiguration.get());
     byte[] serializedKeyset =
-        TinkProtoKeysetFormat.serializeEncryptedKeyset(inputKeyset, masterKeyAead, new byte[] {});
+        TinkProtoKeysetFormat.serializeEncryptedKeyset(
+            inputKeyset, masterKeyAead, new byte[] {}, RegistryConfiguration.get());
     Files.write(inputFile, serializedKeyset);
 
     Tinkey.main(
@@ -162,7 +170,10 @@ public class AddKeyCommandTest {
 
     KeysetHandle handle =
         TinkProtoKeysetFormat.parseEncryptedKeyset(
-            Files.readAllBytes(outputFile), masterKeyAead, new byte[] {});
+            Files.readAllBytes(outputFile),
+            masterKeyAead,
+            new byte[] {},
+            RegistryConfiguration.get());
 
     assertThat(handle.size()).isEqualTo(2);
     assertThat(handle.getAt(0).getKey().equalsKey(inputKeyset.getAt(0).getKey())).isTrue();
@@ -181,12 +192,14 @@ public class AddKeyCommandTest {
     TinkeyTestKmsClient.createCredentialFile(credentialFile);
 
     KeysetHandle masterKeyAeadKeyset =
-        KeysetHandle.generateNew(PredefinedAeadParameters.AES128_GCM);
+        KeysetHandle.generateNew(
+            PredefinedAeadParameters.AES128_GCM, RegistryConfiguration.get());
     Aead masterKeyAead = masterKeyAeadKeyset.getPrimitive(RegistryConfiguration.get(), Aead.class);
     String masterKeyUri = TinkeyTestKmsClient.createKeyUri(masterKeyAeadKeyset);
 
     KeysetHandle inputKeyset =
-        KeysetHandle.generateNew(PredefinedMacParameters.HMAC_SHA256_128BITTAG);
+        KeysetHandle.generateNew(
+            PredefinedMacParameters.HMAC_SHA256_128BITTAG, RegistryConfiguration.get());
     String serializedKeyset =
         TinkJsonProtoKeysetFormat.serializeEncryptedKeyset(
             inputKeyset, masterKeyAead, new byte[] {});

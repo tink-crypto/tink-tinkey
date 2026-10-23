@@ -114,7 +114,9 @@ public class CreateKeysetCommandTest {
 
     KeysetHandle handle =
         TinkProtoKeysetFormat.parseKeyset(
-            Files.readAllBytes(outputFile), InsecureSecretKeyAccess.get());
+            Files.readAllBytes(outputFile),
+            InsecureSecretKeyAccess.get(),
+            RegistryConfiguration.get());
 
     assertThat(handle.size()).isEqualTo(1);
     assertThat(handle.getPrimary().getKey().getParameters())
@@ -130,7 +132,8 @@ public class CreateKeysetCommandTest {
     TinkeyTestKmsClient.createCredentialFile(credentialFile);
 
     KeysetHandle masterKeyAeadKeyset =
-        KeysetHandle.generateNew(PredefinedAeadParameters.AES128_GCM);
+        KeysetHandle.generateNew(
+            PredefinedAeadParameters.AES128_GCM, RegistryConfiguration.get());
     Aead masterKeyAead = masterKeyAeadKeyset.getPrimitive(RegistryConfiguration.get(), Aead.class);
     String masterKeyUri = TinkeyTestKmsClient.createKeyUri(masterKeyAeadKeyset);
 
@@ -146,7 +149,10 @@ public class CreateKeysetCommandTest {
 
     KeysetHandle handle =
         TinkProtoKeysetFormat.parseEncryptedKeyset(
-            Files.readAllBytes(outputFile), masterKeyAead, new byte[] {});
+            Files.readAllBytes(outputFile),
+            masterKeyAead,
+            new byte[] {},
+            RegistryConfiguration.get());
 
     assertThat(handle.size()).isEqualTo(1);
     assertThat(handle.getPrimary().getKey().getParameters())
@@ -162,7 +168,8 @@ public class CreateKeysetCommandTest {
     TinkeyTestKmsClient.createCredentialFile(credentialFile);
 
     KeysetHandle masterKeyAeadKeyset =
-        KeysetHandle.generateNew(PredefinedAeadParameters.AES128_GCM);
+        KeysetHandle.generateNew(
+            PredefinedAeadParameters.AES128_GCM, RegistryConfiguration.get());
     Aead masterKeyAead = masterKeyAeadKeyset.getPrimitive(RegistryConfiguration.get(), Aead.class);
     String masterKeyUri = TinkeyTestKmsClient.createKeyUri(masterKeyAeadKeyset);
 

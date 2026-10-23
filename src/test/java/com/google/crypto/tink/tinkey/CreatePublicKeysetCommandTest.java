@@ -64,7 +64,9 @@ public class CreatePublicKeysetCommandTest {
     Path publicKeyFile = Paths.get(path.toString(), "publicKeyFile");
 
     KeysetHandle privateKeyset =
-        KeysetHandle.generateNew(Ed25519Parameters.create(Ed25519Parameters.Variant.TINK));
+        KeysetHandle.generateNew(
+            Ed25519Parameters.create(Ed25519Parameters.Variant.TINK),
+            RegistryConfiguration.get());
     String serializedKeyset =
         TinkJsonProtoKeysetFormat.serializeKeyset(privateKeyset, InsecureSecretKeyAccess.get());
     Files.write(privateKeyFile, serializedKeyset.getBytes(UTF_8));
@@ -93,9 +95,12 @@ public class CreatePublicKeysetCommandTest {
     Path publicKeyFile = Paths.get(path.toString(), "publicKeyFile");
 
     KeysetHandle privateKeyset =
-        KeysetHandle.generateNew(Ed25519Parameters.create(Ed25519Parameters.Variant.TINK));
+        KeysetHandle.generateNew(
+            Ed25519Parameters.create(Ed25519Parameters.Variant.TINK),
+            RegistryConfiguration.get());
     byte[] serializedKeyset =
-        TinkProtoKeysetFormat.serializeKeyset(privateKeyset, InsecureSecretKeyAccess.get());
+        TinkProtoKeysetFormat.serializeKeyset(
+            privateKeyset, InsecureSecretKeyAccess.get(), RegistryConfiguration.get());
     Files.write(privateKeyFile, serializedKeyset);
 
     Tinkey.main(
@@ -112,7 +117,8 @@ public class CreatePublicKeysetCommandTest {
         });
 
     KeysetHandle publicKeyset =
-        TinkProtoKeysetFormat.parseKeysetWithoutSecret(Files.readAllBytes(publicKeyFile));
+        TinkProtoKeysetFormat.parseKeysetWithoutSecret(
+            Files.readAllBytes(publicKeyFile), RegistryConfiguration.get());
     assertThat(publicKeyset.size()).isEqualTo(1);
     Key expectedPublicKey = ((PrivateKey) privateKeyset.getPrimary().getKey()).getPublicKey();
     assertTrue(publicKeyset.getPrimary().getKey().equalsKey(expectedPublicKey));
@@ -127,12 +133,15 @@ public class CreatePublicKeysetCommandTest {
     TinkeyTestKmsClient.createCredentialFile(credentialFile);
 
     KeysetHandle masterKeyAeadKeyset =
-        KeysetHandle.generateNew(PredefinedAeadParameters.AES128_GCM);
+        KeysetHandle.generateNew(
+            PredefinedAeadParameters.AES128_GCM, RegistryConfiguration.get());
     Aead masterKeyAead = masterKeyAeadKeyset.getPrimitive(RegistryConfiguration.get(), Aead.class);
     String masterKeyUri = TinkeyTestKmsClient.createKeyUri(masterKeyAeadKeyset);
 
     KeysetHandle privateKeyset =
-        KeysetHandle.generateNew(Ed25519Parameters.create(Ed25519Parameters.Variant.TINK));
+        KeysetHandle.generateNew(
+            Ed25519Parameters.create(Ed25519Parameters.Variant.TINK),
+            RegistryConfiguration.get());
 
     String serializedKeyset =
         TinkJsonProtoKeysetFormat.serializeEncryptedKeyset(
@@ -170,15 +179,19 @@ public class CreatePublicKeysetCommandTest {
     TinkeyTestKmsClient.createCredentialFile(credentialFile);
 
     KeysetHandle masterKeyAeadKeyset =
-        KeysetHandle.generateNew(PredefinedAeadParameters.AES128_GCM);
+        KeysetHandle.generateNew(
+            PredefinedAeadParameters.AES128_GCM, RegistryConfiguration.get());
     Aead masterKeyAead = masterKeyAeadKeyset.getPrimitive(RegistryConfiguration.get(), Aead.class);
     String masterKeyUri = TinkeyTestKmsClient.createKeyUri(masterKeyAeadKeyset);
 
     KeysetHandle privateKeyset =
-        KeysetHandle.generateNew(Ed25519Parameters.create(Ed25519Parameters.Variant.TINK));
+        KeysetHandle.generateNew(
+            Ed25519Parameters.create(Ed25519Parameters.Variant.TINK),
+            RegistryConfiguration.get());
 
     byte[] serializedKeyset =
-        TinkProtoKeysetFormat.serializeEncryptedKeyset(privateKeyset, masterKeyAead, new byte[] {});
+        TinkProtoKeysetFormat.serializeEncryptedKeyset(
+            privateKeyset, masterKeyAead, new byte[] {}, RegistryConfiguration.get());
 
     Files.write(privateKeyFile, serializedKeyset);
 
