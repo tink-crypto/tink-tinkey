@@ -109,3 +109,17 @@ java_test(
         "@maven//:junit_junit",
     ],
 )
+
+java_test(
+    name = "ManipulateKeyCommandsTest",
+    size = "small",
+    srcs = ["ManipulateKeyCommandsTest.java"],
+    deps = [
+        "//src/main/java/com/google/crypto/tink/tinkey",
+        "//src/main/java/com/google/crypto/tink/tinkey:kms_clients_factory",
+        "//src/main/java/com/google/crypto/tink/tinkey:tinkey_test_kms_client",
+        "@maven//:com_google_crypto_tink_tink",
+        "@maven//:com_google_truth_truth",
+        "@maven//:junit_junit",
+    ],
+)
