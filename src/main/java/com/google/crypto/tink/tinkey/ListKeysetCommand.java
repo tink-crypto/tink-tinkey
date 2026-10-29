@@ -18,6 +18,7 @@ package com.google.crypto.tink.tinkey;
 
 import com.google.crypto.tink.KeysetHandle;
 import com.google.crypto.tink.LegacyKeysetSerialization;
+import com.google.crypto.tink.RegistryConfiguration;
 import com.google.crypto.tink.proto.KeysetInfo;
 import java.io.InputStream;
 
@@ -39,7 +40,8 @@ public class ListKeysetCommand extends InOptions implements Command {
       String inFormat, String masterKeyUri, String credentialPath) throws Exception {
     KeysetHandle handle = TinkeyUtil.getKeysetHandle(inputStream, inFormat, masterKeyUri,
         credentialPath);
-    KeysetInfo keysetInfo = LegacyKeysetSerialization.getKeysetInfo(handle);
+    KeysetInfo keysetInfo =
+        LegacyKeysetSerialization.getKeysetInfo(handle, RegistryConfiguration.get());
     System.out.println(keysetInfo);
   }
 }
