@@ -25,6 +25,12 @@
 #
 #   CONTAINER_IMAGE="us-docker.pkg.dev/tink-test-infrastructure/tink-ci-images/linux-tink-java-base:latest" \
 #     sh ./kokoro/gcp_ubuntu/release/run_tests.sh
+
+# Unique hex string of length 20
+echo "================================================================================"
+echo "Tink Script ID: aa7655436c27a11b37c7 (to quickly find the script from logs)"
+echo "================================================================================"
+
 set -eEuo pipefail
 
 # Fail if RELEASE_VERSION is not set.

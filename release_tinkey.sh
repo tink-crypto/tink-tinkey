@@ -22,6 +22,11 @@
 #   - Bazelisk (https://github.com/bazelbuild/bazelisk) or Bazel
 #     (https://bazel.build/)
 
+# Unique hex string of length 20
+echo "================================================================================"
+echo "Tink Script ID: 67f5445ff01e3599a8f8 (to quickly find the script from logs)"
+echo "================================================================================"
+
 usage() {
   echo "Usage: $0 [-dh] <version>"
   echo "  -d: Dry run. Only execute idempotent commands (default: FALSE)."
