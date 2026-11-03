@@ -104,7 +104,8 @@ final class TinkeyTestKmsClient implements KmsClient {
   public Aead getAead(String keyUri) throws GeneralSecurityException {
     checkCredentials();
     String keyset = stripPrefix(prefix, keyUri);
-    return TinkJsonProtoKeysetFormat.parseKeyset(keyset, InsecureSecretKeyAccess.get())
+    return TinkJsonProtoKeysetFormat.parseKeyset(
+            keyset, RegistryConfiguration.get(), InsecureSecretKeyAccess.get())
         .getPrimitive(RegistryConfiguration.get(), Aead.class);
   }
 }

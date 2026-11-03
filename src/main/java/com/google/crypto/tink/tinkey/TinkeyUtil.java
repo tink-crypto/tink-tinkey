@@ -24,6 +24,7 @@ import com.google.crypto.tink.KeyTemplate;
 import com.google.crypto.tink.KeysetHandle;
 import com.google.crypto.tink.KeysetManager;
 import com.google.crypto.tink.Parameters;
+import com.google.crypto.tink.RegistryConfiguration;
 import com.google.crypto.tink.TinkJsonProtoKeysetFormat;
 import com.google.crypto.tink.TinkProtoKeysetFormat;
 import java.io.ByteArrayInputStream;
@@ -240,7 +241,7 @@ final class TinkeyUtil {
     }
     if (isJson(inFormat)) {
       return TinkJsonProtoKeysetFormat.parseKeyset(
-          new String(keyset, UTF_8), InsecureSecretKeyAccess.get());
+          new String(keyset, UTF_8), RegistryConfiguration.get(), InsecureSecretKeyAccess.get());
     }
     return TinkProtoKeysetFormat.parseKeyset(keyset, InsecureSecretKeyAccess.get());
   }
