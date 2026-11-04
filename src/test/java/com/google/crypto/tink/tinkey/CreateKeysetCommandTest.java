@@ -70,7 +70,9 @@ public class CreateKeysetCommandTest {
 
     KeysetHandle handle =
         TinkJsonProtoKeysetFormat.parseKeyset(
-            new String(Files.readAllBytes(outputFile), UTF_8), InsecureSecretKeyAccess.get());
+            new String(Files.readAllBytes(outputFile), UTF_8),
+            RegistryConfiguration.get(),
+            InsecureSecretKeyAccess.get());
 
     assertThat(handle.size()).isEqualTo(1);
     assertThat(handle.getPrimary().getKey().getParameters())
@@ -92,7 +94,9 @@ public class CreateKeysetCommandTest {
 
     KeysetHandle handle =
         TinkJsonProtoKeysetFormat.parseKeyset(
-            new String(Files.readAllBytes(outputFile), UTF_8), InsecureSecretKeyAccess.get());
+            new String(Files.readAllBytes(outputFile), UTF_8),
+            RegistryConfiguration.get(),
+            InsecureSecretKeyAccess.get());
 
     assertThat(handle.size()).isEqualTo(1);
     assertThat(handle.getPrimary().getKey().getParameters())
@@ -185,7 +189,10 @@ public class CreateKeysetCommandTest {
 
     KeysetHandle handle =
         TinkJsonProtoKeysetFormat.parseEncryptedKeyset(
-            new String(Files.readAllBytes(outputFile), UTF_8), masterKeyAead, new byte[] {});
+            new String(Files.readAllBytes(outputFile), UTF_8),
+            masterKeyAead,
+            new byte[] {},
+            RegistryConfiguration.get());
 
     assertThat(handle.size()).isEqualTo(1);
     assertThat(handle.getPrimary().getKey().getParameters())

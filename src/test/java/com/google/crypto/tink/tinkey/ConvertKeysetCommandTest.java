@@ -71,6 +71,7 @@ public final class ConvertKeysetCommandTest {
 
   private static KeysetHandle createArbitraryKeyset() throws GeneralSecurityException {
     return KeysetHandle.newBuilder()
+        .setConfiguration(RegistryConfiguration.get())
         .addEntry(
             KeysetHandle.generateEntryFromParameters(PredefinedMacParameters.HMAC_SHA256_128BITTAG)
                 .withRandomId()
@@ -88,7 +89,8 @@ public final class ConvertKeysetCommandTest {
 
     KeysetHandle inputKeyset = createArbitraryKeyset();
     String serializedKeyset =
-        TinkJsonProtoKeysetFormat.serializeKeyset(inputKeyset, InsecureSecretKeyAccess.get());
+        TinkJsonProtoKeysetFormat.serializeKeyset(
+            inputKeyset, RegistryConfiguration.get(), InsecureSecretKeyAccess.get());
     Files.write(inputFile, serializedKeyset.getBytes(UTF_8));
 
     Tinkey.main(
@@ -142,7 +144,9 @@ public final class ConvertKeysetCommandTest {
 
     KeysetHandle outputKeyset =
         TinkJsonProtoKeysetFormat.parseKeyset(
-            new String(Files.readAllBytes(outputFile), UTF_8), InsecureSecretKeyAccess.get());
+            new String(Files.readAllBytes(outputFile), UTF_8),
+            RegistryConfiguration.get(),
+            InsecureSecretKeyAccess.get());
 
     assertThat(outputKeyset.size()).isEqualTo(inputKeyset.size());
     for (int i = 0; i < inputKeyset.size(); i++) {
@@ -179,7 +183,10 @@ public final class ConvertKeysetCommandTest {
 
     KeysetHandle outputKeyset =
         TinkJsonProtoKeysetFormat.parseEncryptedKeyset(
-            new String(Files.readAllBytes(outputFile), UTF_8), masterKeyAead, new byte[] {});
+            new String(Files.readAllBytes(outputFile), UTF_8),
+            masterKeyAead,
+            new byte[] {},
+            RegistryConfiguration.get());
 
     assertThat(outputKeyset.size()).isEqualTo(inputKeyset.size());
     for (int i = 0; i < inputKeyset.size(); i++) {
@@ -220,7 +227,10 @@ public final class ConvertKeysetCommandTest {
 
     KeysetHandle outputKeyset =
         TinkJsonProtoKeysetFormat.parseEncryptedKeyset(
-            new String(Files.readAllBytes(outputFile), UTF_8), masterKeyAead, new byte[] {});
+            new String(Files.readAllBytes(outputFile), UTF_8),
+            masterKeyAead,
+            new byte[] {},
+            RegistryConfiguration.get());
 
     assertThat(outputKeyset.size()).isEqualTo(inputKeyset.size());
     for (int i = 0; i < inputKeyset.size(); i++) {
@@ -259,7 +269,9 @@ public final class ConvertKeysetCommandTest {
 
     KeysetHandle outputKeyset =
         TinkJsonProtoKeysetFormat.parseKeyset(
-            new String(Files.readAllBytes(outputFile), UTF_8), InsecureSecretKeyAccess.get());
+            new String(Files.readAllBytes(outputFile), UTF_8),
+            RegistryConfiguration.get(),
+            InsecureSecretKeyAccess.get());
 
     assertThat(outputKeyset.size()).isEqualTo(inputKeyset.size());
     for (int i = 0; i < inputKeyset.size(); i++) {

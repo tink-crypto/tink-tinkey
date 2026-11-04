@@ -68,7 +68,8 @@ public class CreatePublicKeysetCommandTest {
             Ed25519Parameters.create(Ed25519Parameters.Variant.TINK),
             RegistryConfiguration.get());
     String serializedKeyset =
-        TinkJsonProtoKeysetFormat.serializeKeyset(privateKeyset, InsecureSecretKeyAccess.get());
+        TinkJsonProtoKeysetFormat.serializeKeyset(
+            privateKeyset, RegistryConfiguration.get(), InsecureSecretKeyAccess.get());
     Files.write(privateKeyFile, serializedKeyset.getBytes(UTF_8));
 
     Tinkey.main(
@@ -82,7 +83,7 @@ public class CreatePublicKeysetCommandTest {
 
     KeysetHandle publicKeyset =
         TinkJsonProtoKeysetFormat.parseKeysetWithoutSecret(
-            new String(Files.readAllBytes(publicKeyFile), UTF_8));
+            new String(Files.readAllBytes(publicKeyFile), UTF_8), RegistryConfiguration.get());
     assertThat(publicKeyset.size()).isEqualTo(1);
     Key expectedPublicKey = ((PrivateKey) privateKeyset.getPrimary().getKey()).getPublicKey();
     assertTrue(publicKeyset.getPrimary().getKey().equalsKey(expectedPublicKey));
@@ -145,7 +146,7 @@ public class CreatePublicKeysetCommandTest {
 
     String serializedKeyset =
         TinkJsonProtoKeysetFormat.serializeEncryptedKeyset(
-            privateKeyset, masterKeyAead, new byte[] {});
+            privateKeyset, masterKeyAead, new byte[] {}, RegistryConfiguration.get());
 
     Files.write(privateKeyFile, serializedKeyset.getBytes(UTF_8));
 
@@ -164,7 +165,7 @@ public class CreatePublicKeysetCommandTest {
 
     KeysetHandle publicKeyset =
         TinkJsonProtoKeysetFormat.parseKeysetWithoutSecret(
-            new String(Files.readAllBytes(publicKeyFile), UTF_8));
+            new String(Files.readAllBytes(publicKeyFile), UTF_8), RegistryConfiguration.get());
     assertThat(publicKeyset.size()).isEqualTo(1);
     Key expectedPublicKey = ((PrivateKey) privateKeyset.getPrimary().getKey()).getPublicKey();
     assertTrue(publicKeyset.getPrimary().getKey().equalsKey(expectedPublicKey));
@@ -212,7 +213,7 @@ public class CreatePublicKeysetCommandTest {
 
     KeysetHandle publicKeyset =
         TinkJsonProtoKeysetFormat.parseKeysetWithoutSecret(
-            new String(Files.readAllBytes(publicKeyFile), UTF_8));
+            new String(Files.readAllBytes(publicKeyFile), UTF_8), RegistryConfiguration.get());
     assertThat(publicKeyset.size()).isEqualTo(1);
     Key expectedPublicKey = ((PrivateKey) privateKeyset.getPrimary().getKey()).getPublicKey();
     assertTrue(publicKeyset.getPrimary().getKey().equalsKey(expectedPublicKey));

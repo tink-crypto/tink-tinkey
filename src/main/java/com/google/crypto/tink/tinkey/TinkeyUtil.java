@@ -83,7 +83,8 @@ final class TinkeyUtil {
       String credentialPath,
       KeyTemplate keyTemplate)
       throws GeneralSecurityException, IOException {
-    KeysetHandle handle = KeysetHandle.generateNew(keyTemplate);
+    KeysetHandle handle =
+        KeysetHandle.generateNew(keyTemplate.toParameters(), RegistryConfiguration.get());
 
     writeKeyset(handle, outputStream, outFormat, masterKeyUri, credentialPath);
   }
@@ -138,7 +139,8 @@ final class TinkeyUtil {
       throws GeneralSecurityException, IOException {
     KeysetHandle.Builder builder =
         KeysetHandle.newBuilder(
-            getKeysetHandle(inputStream, inFormat, masterKeyUri, credentialPath));
+                getKeysetHandle(inputStream, inFormat, masterKeyUri, credentialPath))
+            .setConfiguration(RegistryConfiguration.get());
     switch (type) {
       case ADD_KEY:
         builder.addEntry(KeysetHandle.generateEntryFromParameters(parameters).withRandomId());
@@ -173,23 +175,27 @@ final class TinkeyUtil {
               .getAead(masterKeyUri);
       if (isJson(outFormat)) {
         outputStream.write(
-            TinkJsonProtoKeysetFormat.serializeEncryptedKeyset(handle, masterKey, new byte[] {})
+            TinkJsonProtoKeysetFormat.serializeEncryptedKeyset(
+                    handle, masterKey, new byte[] {}, RegistryConfiguration.get())
                 .getBytes(UTF_8));
         return;
       } else {
         outputStream.write(
-            TinkProtoKeysetFormat.serializeEncryptedKeyset(handle, masterKey, new byte[] {}));
+            TinkProtoKeysetFormat.serializeEncryptedKeyset(
+                handle, masterKey, new byte[] {}, RegistryConfiguration.get()));
         return;
       }
     }
     if (isJson(outFormat)) {
       outputStream.write(
-          TinkJsonProtoKeysetFormat.serializeKeyset(handle, InsecureSecretKeyAccess.get())
+          TinkJsonProtoKeysetFormat.serializeKeyset(
+                  handle, RegistryConfiguration.get(), InsecureSecretKeyAccess.get())
               .getBytes(UTF_8));
       return;
     }
     outputStream.write(
-        TinkProtoKeysetFormat.serializeKeyset(handle, InsecureSecretKeyAccess.get()));
+        TinkProtoKeysetFormat.serializeKeyset(
+            handle, InsecureSecretKeyAccess.get(), RegistryConfiguration.get()));
     return;
   }
 
@@ -234,16 +240,18 @@ final class TinkeyUtil {
               .getAead(masterKeyUri);
       if (isJson(inFormat)) {
         return TinkJsonProtoKeysetFormat.parseEncryptedKeyset(
-            new String(keyset, UTF_8), masterKey, new byte[] {});
+            new String(keyset, UTF_8), masterKey, new byte[] {}, RegistryConfiguration.get());
       } else {
-        return TinkProtoKeysetFormat.parseEncryptedKeyset(keyset, masterKey, new byte[] {});
+        return TinkProtoKeysetFormat.parseEncryptedKeyset(
+            keyset, masterKey, new byte[] {}, RegistryConfiguration.get());
       }
     }
     if (isJson(inFormat)) {
       return TinkJsonProtoKeysetFormat.parseKeyset(
           new String(keyset, UTF_8), RegistryConfiguration.get(), InsecureSecretKeyAccess.get());
     }
-    return TinkProtoKeysetFormat.parseKeyset(keyset, InsecureSecretKeyAccess.get());
+    return TinkProtoKeysetFormat.parseKeyset(
+        keyset, InsecureSecretKeyAccess.get(), RegistryConfiguration.get());
   }
 
   /**

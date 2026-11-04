@@ -58,7 +58,8 @@ public class RotateKeysetCommandTest {
         KeysetHandle.generateNew(
             PredefinedMacParameters.HMAC_SHA256_128BITTAG, RegistryConfiguration.get());
     String serializedKeyset =
-        TinkJsonProtoKeysetFormat.serializeKeyset(inputKeyset, InsecureSecretKeyAccess.get());
+        TinkJsonProtoKeysetFormat.serializeKeyset(
+            inputKeyset, RegistryConfiguration.get(), InsecureSecretKeyAccess.get());
     Files.write(inputFile, serializedKeyset.getBytes(UTF_8));
 
     Tinkey.main(
@@ -74,7 +75,9 @@ public class RotateKeysetCommandTest {
 
     KeysetHandle handle =
         TinkJsonProtoKeysetFormat.parseKeyset(
-            new String(Files.readAllBytes(outputFile), UTF_8), InsecureSecretKeyAccess.get());
+            new String(Files.readAllBytes(outputFile), UTF_8),
+            RegistryConfiguration.get(),
+            InsecureSecretKeyAccess.get());
 
     assertThat(handle.size()).isEqualTo(2);
     assertThat(handle.getAt(0).getKey().equalsKey(inputKeyset.getAt(0).getKey())).isTrue();
@@ -204,7 +207,7 @@ public class RotateKeysetCommandTest {
             PredefinedMacParameters.HMAC_SHA256_128BITTAG, RegistryConfiguration.get());
     String serializedKeyset =
         TinkJsonProtoKeysetFormat.serializeEncryptedKeyset(
-            inputKeyset, masterKeyAead, new byte[] {});
+            inputKeyset, masterKeyAead, new byte[] {}, RegistryConfiguration.get());
     Files.write(inputFile, serializedKeyset.getBytes(UTF_8));
 
     Tinkey.main(
@@ -228,7 +231,10 @@ public class RotateKeysetCommandTest {
 
     KeysetHandle handle =
         TinkJsonProtoKeysetFormat.parseEncryptedKeyset(
-            new String(Files.readAllBytes(outputFile), UTF_8), masterKeyAead, new byte[] {});
+            new String(Files.readAllBytes(outputFile), UTF_8),
+            masterKeyAead,
+            new byte[] {},
+            RegistryConfiguration.get());
 
     assertThat(handle.size()).isEqualTo(2);
     assertThat(handle.getAt(0).getKey().equalsKey(inputKeyset.getAt(0).getKey())).isTrue();

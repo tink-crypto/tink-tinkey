@@ -57,7 +57,8 @@ final class TinkeyTestKmsClient implements KmsClient {
 
   static String createKeyUri(KeysetHandle handle) throws GeneralSecurityException {
     return PREFIX
-        + TinkJsonProtoKeysetFormat.serializeKeyset(handle, InsecureSecretKeyAccess.get());
+        + TinkJsonProtoKeysetFormat.serializeKeyset(
+            handle, RegistryConfiguration.get(), InsecureSecretKeyAccess.get());
   }
 
   static void createCredentialFile(Path path) throws IOException {
