@@ -21,6 +21,9 @@ maven.install(
         "com.google.crypto.tink:tink-awskms:2.1.0",
         "com.google.crypto.tink:tink-gcpkms:1.12.0",
         "com.google.crypto.tink:tink:1.24.0",
+        # Pin Guava to a version fixing CVE-2026-102554 and CVE-2026-118042
+        # until tink-gcpkms and tink-awskms releases pull it in directly.
+        "com.google.guava:guava:33.8.0-jre",
         "com.google.truth:truth:1.4.5",
         "junit:junit:4.13.2",
         "org.conscrypt:conscrypt-openjdk-uber:2.7.0",
